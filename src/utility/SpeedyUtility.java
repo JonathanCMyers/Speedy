@@ -6,8 +6,13 @@
  * Date:     3/15/2017          *
  ********************************/
 
-package serialization;
+package utility;
 
-public class SynStream extends ControlFrame {
-
+/**
+ * Contains constants for use throughout the project
+ * @author MyersJO
+ * @version 1.0 Build 3/15/2017
+ */
+public class SpeedyUtility {
+	
 }

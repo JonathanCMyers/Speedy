@@ -8,6 +8,6 @@
 
 package serialization;
 
-public class SynReply {
+public class SynReply extends ControlFrame {
 
 }

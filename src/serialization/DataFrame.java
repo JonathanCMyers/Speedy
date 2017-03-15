@@ -8,6 +8,6 @@
 
 package serialization;
 
-public class SynStream extends ControlFrame {
+public class DataFrame extends Frame {
 
 }

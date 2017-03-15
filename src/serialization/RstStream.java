@@ -8,6 +8,6 @@
 
 package serialization;
 
-public class RstStream {
+public class RstStream extends ControlFrame {
 
 }

@@ -6,8 +6,8 @@
  * Date:     3/15/2017          *
  ********************************/
 
-package serialization;
+package client;
 
-public class SynStream extends ControlFrame {
+public class Client {
 
 }
