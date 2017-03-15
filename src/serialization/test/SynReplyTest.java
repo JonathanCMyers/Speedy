@@ -6,8 +6,8 @@
  * Date:     3/15/2017          *
  ********************************/
 
-package serialization;
+package serialization.test;
 
-public class Goaway {
-	
+public class SynReplyTest {
+
 }

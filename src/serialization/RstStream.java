@@ -8,6 +8,6 @@
 
 package serialization;
 
-public class Goaway {
-	
+public class RstStream {
+
 }
