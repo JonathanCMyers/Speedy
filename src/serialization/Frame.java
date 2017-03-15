@@ -8,6 +8,15 @@
 
 package serialization;
 
+import serialization.exception.SpeedyException;
+
 public abstract class Frame {
 	
+	public byte[] encode() {
+		return null;
+	}
+	
+	public static Frame decode(byte[] encodedBytes) throws SpeedyException {
+		return null;
+	}
 }

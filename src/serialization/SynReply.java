@@ -8,6 +8,23 @@
 
 package serialization;
 
+import serialization.exception.SpeedyException;
+
 public class SynReply extends ControlFrame {
+	
+	public SynReply() {
+		
+	}
+	
+	public byte[] encode() {
+		byte[] encodedBytes = super.encode();
+		// TODO
+		return encodedBytes;
+	}
+	
+	public static Frame decode(byte[] encodedBytes) throws SpeedyException {
+		// TODO
+		return null;
+	}
 
 }
