@@ -8,11 +8,21 @@
 
 package server;
 
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.OutputStreamWriter;
+import java.security.KeyStore;
 import java.util.logging.FileHandler;
 import java.util.logging.Logger;
 
+import javax.net.ssl.KeyManagerFactory;
+import javax.net.ssl.SSLContext;
+import javax.net.ssl.SSLServerSocket;
 import javax.net.ssl.SSLServerSocketFactory;
+import javax.net.ssl.SSLSocket;
 
 /**
  * Server class to handle the separate threads when a Client tries to connect
@@ -43,10 +53,55 @@ public class Server {
 	 */
 	public static void main(String[] args) throws IOException {
 		
-		setupLogger();	
-		testArgs(args);
+		//setupLogger();	
+		//testArgs(args);
 		
-		SSLServerSocketFactory factory = (SSLServerSocketFactory) SSLServerSocketFactory.getDefault();
+		String ksName = "src/server/SSL.jks";
+		char ksPass[] = "icecream".toCharArray();
+		char ctPass[] = "icecream".toCharArray();
+		try {
+			KeyStore ks = KeyStore.getInstance("JKS");
+			ks.load(new FileInputStream(ksName), ksPass);
+			System.out.println("Loaded key.");
+			KeyManagerFactory kmf = KeyManagerFactory.getInstance("SunX509");
+			kmf.init(ks, ctPass);
+			SSLContext sc = SSLContext.getInstance("TLS");
+			sc.init(kmf.getKeyManagers(), null, null);
+			SSLServerSocketFactory ssf = sc.getServerSocketFactory();
+			SSLServerSocket s = (SSLServerSocket) ssf.createServerSocket(8888);
+			System.out.println("ServerSocket created.");
+			SSLSocket c = (SSLSocket) s.accept();
+			System.out.println("SSLSocket created.");
+			BufferedWriter w =  new BufferedWriter(new OutputStreamWriter(c.getOutputStream()));
+			BufferedReader r = new BufferedReader(new InputStreamReader(c.getInputStream()));
+			String m = "Welcome to SSL Reverse Echo Server. Please type in some words.";
+			w.write(m, 0, m.length());
+			w.newLine();
+			w.flush();
+			while((m = r.readLine()) != null) {
+				if(m.equals(".")) {
+					break;
+				}
+				char[] a = m.toCharArray();
+				int n = a.length;
+				for(int i = 0; i < n/2; i++) {
+					char t = a[i];
+					a[i] = a[n-1-i];
+					a[n-i-1] = t;
+				}
+				w.write(a, 0, n);
+				w.newLine();
+				w.flush();
+			}
+			w.close();
+			r.close();
+			c.close();
+			s.close();
+		} catch(Exception e) {
+			System.err.println(e.toString());
+		}
+		
+		//SSLServerSocketFactory factory = (SSLServerSocketFactory) SSLServerSocketFactory.getDefault();
 		//ServerSocket sslserversocket = factory.createServerSocket(port);
 	}
 	
@@ -78,8 +133,16 @@ public class Server {
 
 /*
 
-This will generate certificate:
-keytool -genkey -keystore yourKEYSTORE -keyalg RSA
+This will generate keystore:
+keytool -genkey -keystore SSL.jks -keyalg RSA
+
+The keystore must be in the server config.
+
+Now export as a certificate:
+keytool -export -keystore SSL.jks -file SSL.cer
+
+Move the SSL.cer to the machine that will include the client. Since it is windows,
+keytool.exe -importcert -file H:/csi\ 5321/SPDYworkspace-git/Speedy/src/client/SSL.cer SSL.cer -keystore SSL.jks -storepass icecream
 
 Enter yourPASSWORD and than start your server with ssl debug information(put yourKEYSTORE into directory with SSLServer.class):
 java -Djavax.net.ssl.keyStore=yourKEYSTORE -Djavax.net.ssl.keyStorePassword=yourPASSWORD -Djava.protocol.handler.pkgs=com.sun.net.ssl.internal.www.protocol -Djavax.net.debug=ssl SSLServer
