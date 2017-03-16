@@ -15,4 +15,6 @@ package utility;
  */
 public class SpeedyUtility {
 	
+	public static final boolean USING_SSL = false;
+	
 }
