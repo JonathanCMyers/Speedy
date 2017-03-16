@@ -8,6 +8,10 @@
 
 package client;
 
-public class Client {
+import serialization.SynStream;
 
+public class Client {
+	public static void main(String[] args) {
+		SynStream s = new SynStream(1);
+	}
 }

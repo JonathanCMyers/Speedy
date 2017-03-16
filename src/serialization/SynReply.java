@@ -11,20 +11,33 @@ package serialization;
 import serialization.exception.SpeedyException;
 
 public class SynReply extends ControlFrame {
+
+	private long streamID;
 	
-	public SynReply() {
-		
+	public SynReply(long streamID) {
+		setStreamID(streamID);
 	}
 	
 	public byte[] encode() {
 		byte[] encodedBytes = super.encode();
 		// TODO
-		return encodedBytes;
+		throw new UnsupportedOperationException("SynReply.encode");
 	}
 	
 	public static Frame decode(byte[] encodedBytes) throws SpeedyException {
 		// TODO
-		return null;
+		throw new UnsupportedOperationException("SynReply.decode");
 	}
+	
+	public void setStreamID(long streamID) {
+		// TODO
+		throw new UnsupportedOperationException("SynReply.setStreamID");
+	}
+	
+	public long getStreamID() {
+		return streamID;
+	}
+	
+	
 
 }

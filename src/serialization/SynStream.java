@@ -21,16 +21,17 @@ public class SynStream extends ControlFrame {
 	public byte[] encode() {
 		byte[] encodedBytes = super.encode();
 		// TODO
-		return encodedBytes;
+		throw new UnsupportedOperationException("SynStream.encode");
 	}
 	
 	public static Frame decode(byte[] encodedBytes) throws SpeedyException {
 		// TODO
-		return null;
+		throw new UnsupportedOperationException("SynStream.decode");
 	}
 	
 	public void setStreamID(long streamID) {
-		//TODO
+		// TODO
+		throw new UnsupportedOperationException("SynStream.setStreamID");
 	}
 	
 	public long getStreamID() {
