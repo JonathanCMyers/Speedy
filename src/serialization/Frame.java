@@ -19,4 +19,16 @@ public abstract class Frame {
 	public static Frame decode(byte[] encodedBytes) throws SpeedyException {
 		return null;
 	}
+	
+	@Override
+	public String toString() {
+		// TODO
+		throw new UnsupportedOperationException("Frame.toString()");
+	}
+	
+	@Override
+	public boolean equals(Object o) {
+		// TODO
+		throw new UnsupportedOperationException("Frame.equals()");
+	}
 }

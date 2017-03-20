@@ -8,21 +8,15 @@
 
 package server;
 
-import java.io.BufferedReader;
-import java.io.BufferedWriter;
-import java.io.FileInputStream;
 import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.OutputStreamWriter;
-import java.security.KeyStore;
+import java.net.ServerSocket;
+import java.net.Socket;
+import java.util.concurrent.Executor;
+import java.util.concurrent.Executors;
 import java.util.logging.FileHandler;
 import java.util.logging.Logger;
 
-import javax.net.ssl.KeyManagerFactory;
-import javax.net.ssl.SSLContext;
-import javax.net.ssl.SSLServerSocket;
-import javax.net.ssl.SSLServerSocketFactory;
-import javax.net.ssl.SSLSocket;
+import utility.SocketFactory;
 
 /**
  * Server class to handle the separate threads when a Client tries to connect
@@ -53,22 +47,85 @@ public class Server {
 	 */
 	public static void main(String[] args) throws IOException {
 		
-		//setupLogger();	
-		//testArgs(args);
+		setupLogger();	
+		testArgs(args);
 		
-		String ksName = "src/server/SSL.jks";
-		char ksPass[] = "icecream".toCharArray();
-		char ctPass[] = "icecream".toCharArray();
+		// Create the ServerSocket
+		try(ServerSocket servSock = SocketFactory.createServerSocket(serverPort)) {
+			// Set SO_REUSEADDR
+			servSock.setReuseAddress(true);
+			// Executor to handle threadCount number of Threads
+			Executor service = Executors.newFixedThreadPool(threadCount);
+			
+			// Run forever, accepting and spawning threads to service each connection
+			while(true) {
+				// Try to accept a new client
+				Socket clientSock = null;
+				try {
+					clientSock = servSock.accept();	
+					clientSock.setSoTimeout(10000); // Set the Client socket timeout to 10 seconds
+				} catch (IOException e) {
+					logger.warning("Issue connecting to a client");
+					throw new IOException(e.getMessage());
+				}
+				
+				// Execute the FoodNetworkProtocol for each Client that connects
+				service.execute(new SpeedyProtocol(clientSock, logger));
+			}
+		} catch(Exception e) {
+			logger.severe(e.getMessage());
+			throw new IOException(e.getMessage());
+		}
+		
+		
+	}
+	
+	public static void setupLogger() throws IOException {
+		// Create a new FileHandler to log whatever is needed
+		FileHandler fileHandler = new FileHandler("connections.log");
+		
+		// Create a Logger for logging whatever the Server needs to do
+		Logger logger = Logger.getLogger("practical");
+		logger.addHandler(fileHandler);
+		logger.setUseParentHandlers(false);
+	}
+	
+	
+	public static void testArgs(String[] args) {
+		// Make sure the Port number and ThreadCount are passed in by the user starting the Server
+		if(args.length != 2) {
+			logger.severe("Parameter(s): <Port> <ThreadCount>");
+			throw new IllegalArgumentException("Parameter(s): <Port> <ThreadCount>");
+		}
+
+		// Read in the server port and thread count
+		serverPort = Integer.parseInt(args[0]);
+		threadCount = Integer.parseInt(args[1]);
+	}
+	
+}
+
+
+
+
+
+
+
+/*
+ * 
+		
+		
+		
+		
+		
+		
+		
+		
+		
 		try {
-			KeyStore ks = KeyStore.getInstance("JKS");
-			ks.load(new FileInputStream(ksName), ksPass);
-			System.out.println("Loaded key.");
-			KeyManagerFactory kmf = KeyManagerFactory.getInstance("SunX509");
-			kmf.init(ks, ctPass);
-			SSLContext sc = SSLContext.getInstance("TLS");
-			sc.init(kmf.getKeyManagers(), null, null);
-			SSLServerSocketFactory ssf = sc.getServerSocketFactory();
-			SSLServerSocket s = (SSLServerSocket) ssf.createServerSocket(8888);
+
+			
+			ServerSocket s = SocketFactory.createServerSocket(serverPort);
 			System.out.println("ServerSocket created.");
 			SSLSocket c = (SSLSocket) s.accept();
 			System.out.println("SSLSocket created.");
@@ -103,55 +160,4 @@ public class Server {
 		
 		//SSLServerSocketFactory factory = (SSLServerSocketFactory) SSLServerSocketFactory.getDefault();
 		//ServerSocket sslserversocket = factory.createServerSocket(port);
-	}
-	
-	public static void setupLogger() throws IOException {
-		// Create a new FileHandler to log whatever is needed
-		FileHandler fileHandler = new FileHandler("connections.log");
-		
-		// Create a Logger for logging whatever the Server needs to do
-		Logger logger = Logger.getLogger("practical");
-		logger.addHandler(fileHandler);
-		logger.setUseParentHandlers(false);
-	}
-	
-	
-	public static void testArgs(String[] args) {
-		// Make sure the Port number and ThreadCount are passed in by the user starting the Server
-		if(args.length != 2) {
-			logger.severe("Parameter(s): <Port> <ThreadCount>");
-			throw new IllegalArgumentException("Parameter(s): <Port> <ThreadCount>");
-		}
-
-		// Read in the server port and thread count
-		serverPort = Integer.parseInt(args[0]);
-		threadCount = Integer.parseInt(args[1]);
-	}
-	
-}
-
-
-/*
-
-This will generate keystore:
-keytool -genkey -keystore SSL.jks -keyalg RSA
-
-The keystore must be in the server config.
-
-Now export as a certificate:
-keytool -export -keystore SSL.jks -file SSL.cer
-
-Move the SSL.cer to the machine that will include the client. Since it is windows,
-keytool.exe -importcert -file H:/csi\ 5321/SPDYworkspace-git/Speedy/src/client/SSL.cer SSL.cer -keystore SSL.jks -storepass icecream
-
-Enter yourPASSWORD and than start your server with ssl debug information(put yourKEYSTORE into directory with SSLServer.class):
-java -Djavax.net.ssl.keyStore=yourKEYSTORE -Djavax.net.ssl.keyStorePassword=yourPASSWORD -Djava.protocol.handler.pkgs=com.sun.net.ssl.internal.www.protocol -Djavax.net.debug=ssl SSLServer
-
-Than start your client(put yourKEYSTORE into directory with SSLClient.class):
-java -Djavax.net.ssl.trustStore=yourKEYSTORE -Djavax.net.ssl.trustStorePassword=yourPASSWORD SSLClient
-
-
-keySTORE = SSL.key
-keyStorePassword = icecream
-
-*/
+		 * */

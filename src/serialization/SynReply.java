@@ -38,6 +38,18 @@ public class SynReply extends ControlFrame {
 		return streamID;
 	}
 	
+	@Override
+	public String toString() {
+		// TODO
+		throw new UnsupportedOperationException("SynReply.toString()");
+	}
+	
+	@Override
+	public boolean equals(Object o) {
+		// TODO
+		throw new UnsupportedOperationException("SynReply.equals()");
+	}
+	
 	
 
 }

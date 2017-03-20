@@ -13,18 +13,31 @@ import serialization.exception.SpeedyException;
 public class Goaway extends ControlFrame {
 	
 	public Goaway() {
-		
+		// TODO
+		throw new UnsupportedOperationException("new Goaway()");
 	}
 	
 	public byte[] encode() {
 		byte[] encodedBytes = super.encode();
 		// TODO
-		return encodedBytes;
+		throw new UnsupportedOperationException("Goaway.encode()");
 	}
 	
 	public static Frame decode(byte[] encodedBytes) throws SpeedyException {
 		// TODO
-		return null;
+		throw new UnsupportedOperationException("Goaway.decode()");
+	}
+	
+	@Override
+	public String toString() {
+		// TODO
+		throw new UnsupportedOperationException("Goaway.toString()");
+	}
+	
+	@Override
+	public boolean equals(Object o) {
+		// TODO
+		throw new UnsupportedOperationException("Goaway.equals()");
 	}
 	
 }

@@ -23,4 +23,16 @@ public abstract class ControlFrame extends Frame {
 		return null;
 	}
 	
+	@Override
+	public String toString() {
+		// TODO
+		throw new UnsupportedOperationException("ControlFrame.toString()");
+	}
+	
+	@Override
+	public boolean equals(Object o) {
+		// TODO
+		throw new UnsupportedOperationException("ControlFrame.equals()");
+	}
+	
 }

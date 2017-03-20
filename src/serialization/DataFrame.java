@@ -22,5 +22,17 @@ public class DataFrame extends Frame {
 		// TODO
 		return null;
 	}
+	
+	@Override
+	public String toString() {
+		// TODO
+		throw new UnsupportedOperationException("DataFrame.toString()");
+	}
+	
+	@Override
+	public boolean equals(Object o) {
+		// TODO
+		throw new UnsupportedOperationException("DataFrame.equals()");
+	}
 
 }

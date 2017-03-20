@@ -8,26 +8,14 @@
 
 package client;
 
-import java.io.BufferedReader;
-import java.io.BufferedWriter;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.OutputStreamWriter;
+import java.io.*;
 import java.net.Socket;
+import java.net.UnknownHostException;
 
-import javax.net.ssl.HttpsURLConnection;
-import javax.net.ssl.SSLContext;
 import javax.net.ssl.SSLSession;
 import javax.net.ssl.SSLSocket;
-import javax.net.ssl.SSLSocketFactory;
-import javax.net.ssl.TrustManager;
-import javax.net.ssl.X509TrustManager;
 
-import java.security.GeneralSecurityException;
-import java.security.cert.CertificateException;
-import java.security.cert.X509Certificate;
-
-import serialization.SynStream;
+import java.util.Scanner;
 
 /**
  * Client to connect and retrieve data from a server
@@ -46,52 +34,32 @@ public class Client {
 	 */
 	private static int serverPort;
 	
+	/**
+	 * Socket that manages the connection from the client to the server
+	 */
+	private static Socket socket;
+	
+	/**
+	 * InputStream from the socket to receive input from the server
+	 */
+	private static InputStream in;
+	
+	/**
+	 * OutputStream from the socket to write output to the server
+	 */
+	private static OutputStream out;
+	
 	public static void main(String[] args) {
 		
-		TrustManager[] trustAllCerts = new TrustManager[] {
-			new X509TrustManager() {
-				public X509Certificate[] getAcceptedIssuers() {
-					return new X509Certificate[0];
-				}
-				public void checkClientTrusted(X509Certificate[] arg0, String arg1) throws CertificateException {
-
-				}
-				public void checkServerTrusted(X509Certificate[] arg0, String arg1) throws CertificateException {
-
-				}
-			}
-		};
+		handleArgs(args); // Store the port number and server from the arguments given
+		createSocket(); // Create socket that is connected to server on specified port
+		//Scanner reader = new Scanner(System.in); // Create the scanner to read in the input from the user
 		
-		// Install malicious TrustManager
-		try {
-			SSLContext sc = SSLContext.getInstance("SSL");
-			sc.init(null, trustAllCerts, new java.security.SecureRandom());
-			HttpsURLConnection.setDefaultSSLSocketFactory(sc.getSocketFactory());
-		} catch(GeneralSecurityException e) {
-			
-		}
+		// Request page
+		// Receive multiplexed elements of page
+		// Reconstruct page
 		
-		//handleArgs(args);
 		
-		SSLSocketFactory f = (SSLSocketFactory) SSLSocketFactory.getDefault();
-		try {
-			Socket c = f.createSocket("localhost", 8888);
-			((SSLSocket)c).startHandshake();
-			printSocketInfo((SSLSocket)c);
-			BufferedWriter w =  new BufferedWriter(new OutputStreamWriter(c.getOutputStream()));
-			BufferedReader r = new BufferedReader(new InputStreamReader(c.getInputStream()));
-			String m = null;
-			while((m = r.readLine()) != null) {
-				w.write(m, 0, m.length());
-				w.newLine();
-			}
-			w.flush();
-			w.close();
-			r.close();
-			c.close();
-		} catch(IOException e) {
-			System.err.println(e.toString());
-		}
 	}
 	
 	/**
@@ -115,18 +83,20 @@ public class Client {
 		serverName = args[0];
 	}
 	
-	
-	//TODO: Temporary! Delete later.
-	private static void printSocketInfo(SSLSocket s) {
-		System.out.println("Socket class: " + s.getClass());
-		System.out.println("   Remote address = " + s.getInetAddress().toString());
-		System.out.println("   Remote port = " + s.getPort());
-		System.out.println("   Local socket address = " + s.getLocalSocketAddress().toString());
-		System.out.println("   Local address = " + s.getLocalAddress().toString());
-		System.out.println("   Local port = " + s.getLocalPort());
-		System.out.println("   Need client authentication = " + s.getNeedClientAuth());
-		SSLSession ss = s.getSession();
-		System.out.println("   Cipher suite = " + ss.getCipherSuite());
-		System.out.println("   Protocol = " + ss.getProtocol());
+	/**
+	 * Initializes the private Socket, InputStream, and OutputStream variables
+	 */
+	public static void createSocket() {
+		try {
+			socket = new Socket(serverName, serverPort);
+			in = socket.getInputStream();
+			out = socket.getOutputStream();
+		} catch(UnknownHostException e) {
+			System.err.println("Unable to communicate: Unknown Host.");
+			System.exit(1);
+		} catch(IOException e) {
+			System.err.println("Unable to communicate: IOException from socket initialization");
+			System.exit(1);
+		}
 	}
 }

@@ -13,18 +13,29 @@ import serialization.exception.SpeedyException;
 public class RstStream extends ControlFrame {
 	
 	public RstStream() {
-		
+		throw new UnsupportedOperationException("RstStream()");
 	}
 	
 	public byte[] encode() {
 		byte[] encodedBytes = super.encode();
-		// TODO
-		return encodedBytes;
+		throw new UnsupportedOperationException("RstStream.encode()");
 	}
 	
 	public static Frame decode(byte[] encodedBytes) throws SpeedyException {
 		// TODO
-		return null;
+		throw new UnsupportedOperationException("RstStream.decode()");
+	}
+	
+	@Override
+	public String toString() {
+		// TODO
+		throw new UnsupportedOperationException("RstStream.toString()");
+	}
+	
+	@Override
+	public boolean equals(Object o) {
+		// TODO
+		throw new UnsupportedOperationException("RstStream.equals()");
 	}
 
 }
