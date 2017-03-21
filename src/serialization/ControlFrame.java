@@ -12,9 +12,29 @@ import serialization.exception.SpeedyException;
 
 public abstract class ControlFrame extends Frame {
 	
+	
+	/**
+	 * Holds the version of the protocol, currently 1.
+	 */
+	protected short version;
+	
+	/**
+	 * Holds the type of ControlFrame
+	 */
+	protected short type;
+	
+	public ControlFrame(){
+		//The flag of control frame
+		this.CFlag = true;
+		this.length = 0;
+	}
+	
+	
 	public byte[] encode() {
 		byte[] encodedBytes = super.encode();
-		// TODO
+		// Encode CFlag
+		
+		
 		return encodedBytes;
 	}
 	
@@ -35,4 +55,20 @@ public abstract class ControlFrame extends Frame {
 		throw new UnsupportedOperationException("ControlFrame.equals()");
 	}
 	
+	/**
+	 * Sets the value of version
+	 * @param v
+	 */
+	
+	public void setVersion(short v){
+		version = v;
+	}
+	
+	/**
+	 * Gets the value of version
+	 *
+	 */
+	public short getVersion(){
+		return version;
+	}
 }
