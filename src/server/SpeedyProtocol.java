@@ -8,7 +8,6 @@
 
 package server;
 
-import java.io.EOFException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -72,43 +71,14 @@ public class SpeedyProtocol implements Runnable {
 					" with thread id " + Thread.currentThread().getId() + "\n");
 
 			while(true) {
-				Frame fm = receiveFrame();
-				
-				/*
-				// Read in the FoodMessage from the Client
-				FoodMessage fm = receiveFoodMessage(in, out, clientSock, logger);
-				
-				// Handle the FoodMessage sent by the Client
-				int interval = -1;
 				try {
-					interval = handleFoodMessage(fm, foodmgr, out, clientSock, logger);
-				} catch(FoodNetworkException e) {
-					logger.severe("Error interfacing with FoodManager. Closing connection to " + 
-							clientSock.getInetAddress() + "-" + clientSock.getLocalPort() + ".");
-					closeClient(clientSock);
-				} 
-				
-				// Create the FoodList to send to the Client based on the interval
-				FoodMessage flist = null;
-				try {
-					flist = createFoodList(fm, foodmgr, interval, clientSock, logger);
-				} catch (FoodNetworkException e) {
-					logger.severe("Error creating FoodList for " + clientSock.getInetAddress() + "-" +
-							clientSock.getPort() + ". Closing connection.");
-					closeClient(clientSock);
+					Frame fm = receiveFrame();
+				} catch (ServerContinueException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
 				}
 				
-				// Send the FoodList to the Client
-				try {
-					flist.encode(new MessageOutput(out));
-					// Log the sent message
-					logger.info("Send Message: Sent to " + clientSock.getInetAddress() + "-" + clientSock.getPort() + 
-							" " + flist.toString() + "\n");
-				} catch(FoodNetworkException e) {
-					logger.severe("Unable to write to client: " + clientSock.getInetAddress() + ". Closing connection.");
-					closeClient(clientSock);
-				}
-				*/
+				
 			} 
 		} catch(ServerBreakException e) {
 			System.exit(1);
@@ -176,50 +146,6 @@ public class SpeedyProtocol implements Runnable {
 			throw new ServerBreakException("Error decoding client's packet: " + e.getMessage(), e);
 		}
 		
-		
-		
-		
-		/*
-		// Read in a message from the client
-		MessageInput min = new MessageInput(in);
-		FoodMessage fm = null;
-		try {
-			// Decode the message from the Client
-			fm = FoodMessage.decode(min);
-		} catch(FoodMessageVersionException e) {
-			// If the version is incorrect, send an ErrorMessage to the Client and throw a ServerBreakException
-			sendErrorMessage(e.getMessage(), out, clientSock, logger);
-			closeClient(clientSock);
-			return null;
-		} catch(EOFException e) {
-			sendErrorMessage("Unable to parse message from " + clientSock.getInetAddress() + 
-					"-" + clientSock.getLocalPort() + ".", out, clientSock, logger);
-			closeClient(clientSock);
-			return null;
-		} catch(Exception e) {
-			if(e.getMessage() == null) {
-				// Server timeout exception
-				logger.warning("Client " + clientSock.getInetAddress() + "-" + clientSock.getLocalPort() + " timed out.");
-				closeClient(clientSock);
-				return null;
-			}
-			// If there is an issue reading in the full message, send an ErrorMessage and throw a ServerContinueException
-			sendErrorMessage("Unable to parse message from " + clientSock.getInetAddress() + 
-					"-" + clientSock.getLocalPort() + ".", out, clientSock, logger);
-			closeClient(clientSock);
-			return null;
-		}
-		if(fm == null) {
-			sendErrorMessage("Unable to parse message from " + clientSock.getInetAddress() +
-					"-" + clientSock.getLocalPort() + ". Null message", out, clientSock, logger);
-			closeClient(clientSock);
-		}
-		// Log that you received the message
-		logger.info("Received from " + clientSock.getInetAddress() + "-" + clientSock.getPort() + " " + fm.toString() + "\n");
-		return fm;
-		*/
-		
-		
 		return fm;
 	}
 	
@@ -238,7 +164,7 @@ public class SpeedyProtocol implements Runnable {
 			byte[] encodedGoaway = fm.encode();
 			out.write(encodedGoaway);
 			logger.info("[Send message] Sent to " + clientSock.getInetAddress() + "-" + clientSock.getPort() + " " + fm.toString() + "\n");
-		} catch(SpeedyException e) {
+		} catch(IOException e) {
 			logger.severe("Unable to write to client: " + clientSock.getInetAddress() + ". Closing connection.\n");
 			closeClient();
 		}
