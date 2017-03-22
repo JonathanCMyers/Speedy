@@ -25,8 +25,8 @@ public abstract class ControlFrame extends Frame {
 	
 	public ControlFrame(){
 		//The flag of control frame
-		this.CFlag = true;
-		this.length = 0;
+		setCFlag(true);
+		setLength(8);
 	}
 	
 	

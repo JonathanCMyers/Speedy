@@ -15,7 +15,7 @@ public abstract class Frame {
 	/**
 	 * Holds the type of Frame, 0:DATA FRAME, 1: CONTROL FRAME
 	 */
-	boolean CFlag;
+	protected boolean CFlag;
 	
 	/**
 	 * 8 bits containing the flags for the frame
@@ -53,7 +53,7 @@ public abstract class Frame {
 	 * Sets the value of CFlag
 	 * @param flag
 	 */
-	public void SetCFlags(boolean flag){
+	public void setCFlag(boolean flag){
 		CFlag = flag;
 	}
 	
@@ -61,7 +61,7 @@ public abstract class Frame {
 	 * Get the value of CFlag
 	 * @return
 	 */
-	public boolean GetFlags(){
+	public boolean getCFlag(){
 		return CFlag;
 	}
 	
@@ -82,4 +82,19 @@ public abstract class Frame {
 		return flags;
 	}
 	
+	/**
+	 * Sets the length
+	 * @param length
+	 */
+	public void setLength(int length){
+		this.length = length;
+	}
+	
+	/**
+	 * Gets the length
+	 * @return
+	 */
+	public int sgtLength(){
+		return length;
+	}
 }
