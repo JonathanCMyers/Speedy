@@ -11,8 +11,40 @@ package serialization;
 import serialization.exception.SpeedyException;
 
 public class SynReply extends ControlFrame {
+	
+	/**
+	 * Holds the streamID of the Frame
+	 */
+	private int streamID;
 
-	private long streamID;
+	/**
+	 * Holds the Associated-To-Stream-ID
+	 * 
+	 * @param streamID
+	 */
+	private int associateStreamID;
+
+	/**
+	 * Holds the slot of the frame
+	 */
+	private byte slot;
+
+	/**
+	 * Holds the length of the header in the frame
+	 */
+	private final static int lengthOfHeader = 16;
+
+	/**
+	 * Holds the number of name/value pairs
+	 */
+	private short numOfPairs;
+
+	/**
+	 * Holds the HeaderBlock for the frame
+	 * 
+	 * @param streamID
+	 */
+	private HeaderBlock headerBlock;
 	
 	public SynReply(long streamID) {
 		setStreamID(streamID);

@@ -100,4 +100,11 @@ public class HeaderBlock {
 		}
 		return headerBlock;
 	}
+	/**
+	 * Gets the number of name/value pairs
+	 * @return
+	 */
+	public short getNumOfPairs(){
+		return (short)blocksList.size();
+	}
 }
