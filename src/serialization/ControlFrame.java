@@ -25,8 +25,8 @@ public abstract class ControlFrame extends Frame {
 	
 	public ControlFrame(){
 		//The flag of control frame
-		this.CFlag = true;
-		this.length = 0;
+		setCFlag(true);
+		setLength(8);
 	}
 	
 	
@@ -70,5 +70,20 @@ public abstract class ControlFrame extends Frame {
 	 */
 	public short getVersion(){
 		return version;
+	}
+	
+	/**
+	 * Sets the value of type
+	 * @param type
+	 */
+	public void setType(short type){
+		this.type = type;
+	}
+	/**
+	 * Gets the vlaue of type
+	 * @return
+	 */
+	public short getType(){
+		return this.type;
 	}
 }

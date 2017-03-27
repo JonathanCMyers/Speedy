@@ -80,7 +80,7 @@ public class HeaderBlock {
 	 * @param encodedHeaderBlock
 	 * @return
 	 */
-	public HeaderBlock decode(byte[] encodedHeaderBlock ){
+	public static HeaderBlock decode(byte[] encodedHeaderBlock ){
 		HeaderBlock headerBlock = new HeaderBlock();
 		int index = 0;
 		//Decode numOfPairs
@@ -99,5 +99,12 @@ public class HeaderBlock {
 			headerBlock.addBlock(block);
 		}
 		return headerBlock;
+	}
+	/**
+	 * Gets the number of name/value pairs
+	 * @return
+	 */
+	public short getNumOfPairs(){
+		return (short)blocksList.size();
 	}
 }
