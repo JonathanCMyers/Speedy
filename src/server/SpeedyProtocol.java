@@ -16,7 +16,7 @@ import java.net.Socket;
 import java.util.logging.Logger;
 
 import serialization.Frame;
-import serialization.Goaway;
+import serialization.GoAway;
 import serialization.exception.ServerBreakException;
 import serialization.exception.ServerContinueException;
 import serialization.exception.SpeedyException;
@@ -72,7 +72,7 @@ public class SpeedyProtocol implements Runnable {
 					" with thread id " + Thread.currentThread().getId() + "\n");
 
 			while(true) {
-				Frame fm = receiveFrame();
+				//Frame fm = receiveFrame();
 				
 				/*
 				// Read in the FoodMessage from the Client
@@ -232,16 +232,10 @@ public class SpeedyProtocol implements Runnable {
 	 */
 	public void sendErrorMessage(String message) throws ServerContinueException, ServerBreakException {
 		
-		// Try to send a Goaway to the client - if this doesn't work, terminate connection with the client.
-		try {
-			Frame fm = new Goaway();
-			byte[] encodedGoaway = fm.encode();
-			out.write(encodedGoaway);
-			logger.info("[Send message] Sent to " + clientSock.getInetAddress() + "-" + clientSock.getPort() + " " + fm.toString() + "\n");
-		} catch(SpeedyException e) {
-			logger.severe("Unable to write to client: " + clientSock.getInetAddress() + ". Closing connection.\n");
-			closeClient();
-		}
+		Frame fm = new GoAway();
+		byte[] encodedGoaway = fm.encode();
+		//out.write(encodedGoaway);
+		logger.info("[Send message] Sent to " + clientSock.getInetAddress() + "-" + clientSock.getPort() + " " + fm.toString() + "\n");
 		
 		// Write to log and throw a ServerBreakException upon successful sending of the Goaway
 		logger.warning(message);

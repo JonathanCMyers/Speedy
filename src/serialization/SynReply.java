@@ -48,7 +48,7 @@ public class SynReply extends ControlFrame {
 	 */
 	private HeaderBlock headerBlock;
 
-	public SynReply(int streamID) {
+	public SynReply(int streamID) throws SpeedyException {
 		headerBlock = new HeaderBlock();
 		setStreamID(streamID);
 		setType(ConstUtility.SYN_REPLY_NUM);
@@ -57,7 +57,7 @@ public class SynReply extends ControlFrame {
 		setNumOfPairs(ConstUtility.NUMBER_OF_PAIRS_DEFAULT);
 	}
 
-	public SynReply(int streamID, HeaderBlock headerBlock) {
+	public SynReply(int streamID, HeaderBlock headerBlock) throws SpeedyException {
 		setHeaderBlock(headerBlock);
 		setStreamID(streamID);
 		setType(ConstUtility.SYN_REPLY_NUM);
@@ -107,6 +107,9 @@ public class SynReply extends ControlFrame {
 	}
 
 	public static Frame decode(byte[] encodedBytes) throws SpeedyException {
+		if(encodedBytes == null || encodedBytes.length < ConstUtility.SYNSTREAM_HEADER_LENGTH){
+			throw new SpeedyException("Unexpected byte array");
+		}
 		// Decode CFlag
 		int index = 0;
 		boolean cFlag = decodeCFlag(encodedBytes[0]);
@@ -145,8 +148,12 @@ public class SynReply extends ControlFrame {
 	 * Sets the value of streamID in the frame
 	 * 
 	 * @param streamID
+	 * @throws SpeedyException 
 	 */
-	public void setStreamID(int streamID) {
+	public void setStreamID(int streamID) throws SpeedyException {
+		if(streamID <=0){
+			throw new SpeedyException("StreamID should be biger than 0.");
+		}
 		this.streamID = streamID;
 	}
 
