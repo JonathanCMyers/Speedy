@@ -12,6 +12,7 @@ import java.util.List;
 
 import serialization.exception.SpeedyException;
 import utility.ByteUtility;
+import utility.ConstUtility;
 
 public class HeaderBlock {
 	/**
@@ -23,6 +24,10 @@ public class HeaderBlock {
 	 */
 	private List<Block> blocksList;
 
+	/**
+	 * Holds the length of header block;
+	 */
+	int length;
 	public HeaderBlock() {
 		blocksList = new ArrayList<>();
 		numOfPairs = 0;
@@ -36,6 +41,8 @@ public class HeaderBlock {
 		Block block = new Block(name, value);
 		numOfPairs++;
 		blocksList.add(block);
+		length += ConstUtility.BLOCK_NAME_LENGTH_LENGTH + ConstUtility.BLOCK_VALUE_LENGTH_LENGTH +
+				block.getName().length() * 2 + block.getValue().length() * 2;
 	}
 	
 	/**
@@ -45,6 +52,8 @@ public class HeaderBlock {
 	public void addBlock(Block block) {
 		numOfPairs++;
 		blocksList.add(block);
+		length += ConstUtility.BLOCK_NAME_LENGTH_LENGTH + ConstUtility.BLOCK_VALUE_LENGTH_LENGTH +
+				block.getName().length() * 2 + block.getValue().length() * 2;
 	}
 
 	/**
@@ -55,19 +64,21 @@ public class HeaderBlock {
 	 */
 	public byte[] encode() throws SpeedyException {
 		if (numOfPairs == 0) {
-			throw new SpeedyException("The blocksList is empty. ");
+			//throw new SpeedyException("The blocksList is empty. ");
 		}
 		List<byte[]> encodedBlocks = new ArrayList<>();
 		int lengthOfEncode = 0;
+		
 		for (Block block : blocksList) {
 			byte[] encodedBlock = block.encode();
+			
 			lengthOfEncode += encodedBlock.length;
 			encodedBlocks.add(encodedBlock);
 		}
 
-		byte[] encodedHeaderBlock = new byte[lengthOfEncode + Integer.SIZE / 8];
-		ByteUtility.copyBytes(encodedHeaderBlock, 0, ByteUtility.uint32ToLittleEndian(this.numOfPairs));
-		int position = Integer.SIZE / 8;
+		byte[] encodedHeaderBlock = new byte[lengthOfEncode];
+		//ByteUtility.copyBytes(encodedHeaderBlock, 0, ByteUtility.uint32ToLittleEndian(this.numOfPairs));
+		int position = 0;
 		for (byte[] eb : encodedBlocks) {
 			ByteUtility.copyBytes(encodedHeaderBlock, position, eb);
 			position += eb.length;
@@ -84,19 +95,17 @@ public class HeaderBlock {
 		HeaderBlock headerBlock = new HeaderBlock();
 		int index = 0;
 		//Decode numOfPairs
-		int numOfPairs = ByteUtility.littleEndianToUINT32(
-				ByteUtility.byteSubarray(encodedHeaderBlock, index, Integer.SIZE/8));
-		index += 4;
-		
-		for(int i =0;i < numOfPairs;i++){
-			int lengthOfName = ByteUtility.littleEndianToUINT32(
-					ByteUtility.byteSubarray(encodedHeaderBlock, index, Integer.SIZE/8));
-			int lengthOfValue = ByteUtility.littleEndianToUINT32(
-					ByteUtility.byteSubarray(encodedHeaderBlock, index + lengthOfName*2 + Integer.SIZE/8, Integer.SIZE/8));
-			int lengthOfBlock = Integer.SIZE/8 + lengthOfName + Integer.SIZE/8 + lengthOfValue;
+		int numOfPairs = 0;
+		while(index < encodedHeaderBlock.length - 1){
+			short lengthOfName = ByteUtility.littleEndianToUINT16(
+					ByteUtility.byteSubarray(encodedHeaderBlock, index, ConstUtility.BLOCK_NAME_LENGTH_LENGTH));
+			short lengthOfValue = ByteUtility.littleEndianToUINT16(
+					ByteUtility.byteSubarray(encodedHeaderBlock, index + lengthOfName*2 + ConstUtility.BLOCK_NAME_LENGTH_LENGTH, ConstUtility.BLOCK_VALUE_LENGTH_LENGTH));
+			int lengthOfBlock = ConstUtility.BLOCK_NAME_LENGTH_LENGTH + lengthOfName*2 + ConstUtility.BLOCK_VALUE_LENGTH_LENGTH + lengthOfValue*2;
 			Block block = Block.decode(ByteUtility.byteSubarray(encodedHeaderBlock, index, lengthOfBlock));
-			index += lengthOfBlock;
 			headerBlock.addBlock(block);
+			numOfPairs++;
+			index += lengthOfBlock;
 		}
 		return headerBlock;
 	}
@@ -107,4 +116,22 @@ public class HeaderBlock {
 	public short getNumOfPairs(){
 		return (short)blocksList.size();
 	}
+	
+	/**
+	 * Gets the blocksList;
+	 * @return
+	 */
+	public List<Block> getBlocksList(){
+		return blocksList;
+	}
+	
+	/**
+	 * Gets the length of Header block
+	 * @return
+	 */
+	public int getLength(){
+		return length;
+	}
+	
+	
 }

@@ -15,6 +15,7 @@ import java.io.IOException;
 import org.junit.Test;
 
 import serialization.Frame;
+import serialization.HeaderBlock;
 import serialization.SynStream;
 import serialization.exception.SpeedyException;
 
@@ -22,7 +23,8 @@ public class SynStreamTest {
 	
 	@Test
 	public void testEncodeDecodeReflexive() throws SpeedyException {
-		SynStream s1 = new SynStream(5);
+		HeaderBlock headerBlock = new HeaderBlock();
+		SynStream s1 = new SynStream(5,headerBlock);
 		byte[] encodedBytes = s1.encode();
 		Frame s2 = Frame.decode(encodedBytes);
 		assertEquals(s1, (SynStream)s2);
@@ -40,54 +42,63 @@ public class SynStreamTest {
 	
 	@Test(expected=SpeedyException.class)
 	public void testSetStreamIDNegative() throws SpeedyException {
-		SynStream s = new SynStream(1);
+		HeaderBlock headerBlock = new HeaderBlock();
+		SynStream s = new SynStream(1,headerBlock);
 		s.setStreamID(-1);
 	}
 	
 	@Test(expected=SpeedyException.class)
 	public void testSetStreamIDZero() throws SpeedyException {
-		SynStream s = new SynStream(1);
+		HeaderBlock headerBlock = new HeaderBlock();
+		SynStream s = new SynStream(1,headerBlock);
 		s.setStreamID(0);
 	}
 	
 	@Test(expected=SpeedyException.class)
 	public void testSetStreamIDTooLarge() throws SpeedyException {
-		SynStream s = new SynStream(1);
-		s.setStreamID((long)Math.pow(2, 31));
+		HeaderBlock headerBlock = new HeaderBlock();
+		SynStream s = new SynStream(1,headerBlock);
+		s.setStreamID((int)Math.pow(2, 31));
 	}
 	
 	@Test(expected=SpeedyException.class)
 	public void testConstructorStreamIDNegative() throws SpeedyException {
-		new SynStream(-1);
+		HeaderBlock headerBlock = new HeaderBlock();
+		new SynStream(-1,headerBlock);
 	}
 	
 	@Test(expected=SpeedyException.class)
 	public void testConstructorStreamIDZero() throws SpeedyException {
-		new SynStream(0);
+		HeaderBlock headerBlock = new HeaderBlock();
+		new SynStream(0,headerBlock);
 	}
 	
 	@Test(expected=SpeedyException.class)
 	public void testConstructorStreamIDTooLarge() throws SpeedyException {
-		new SynStream((long)Math.pow(2, 31));
+		HeaderBlock headerBlock = new HeaderBlock();
+		new SynStream((int)Math.pow(2, 31),headerBlock);
 	}
 	
 	@Test
-	public void testEqualsReflexive() {
-		SynStream s = new SynStream(1);
+	public void testEqualsReflexive() throws SpeedyException {
+		HeaderBlock headerBlock = new HeaderBlock();
+		SynStream s = new SynStream(1,headerBlock);
 		assertEquals(s, s);
 	}
 	
 	@Test
-	public void testEquals() {
-		SynStream s1 = new SynStream(1);
-		SynStream s2 = new SynStream(1);
+	public void testEquals() throws SpeedyException {
+		HeaderBlock headerBlock = new HeaderBlock();
+		SynStream s1 = new SynStream(1,headerBlock);
+		SynStream s2 = new SynStream(1,headerBlock);
 		assertEquals(s1, s2);
 	}
 	
 	@Test
-	public void testOneSideNullNotEqual() {
+	public void testOneSideNullNotEqual() throws SpeedyException {
+		HeaderBlock headerBlock = new HeaderBlock();
 		SynStream s1 = null;
-		SynStream s2 = new SynStream(1);
+		SynStream s2 = new SynStream(1,headerBlock);
 		assertNotEquals(s1, s2);
 	}
 }

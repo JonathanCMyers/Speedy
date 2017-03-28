@@ -20,7 +20,7 @@ public enum FrameType {
 	DATA(0),
 	SYN_STREAM(1),
 	SYN_REPLY(2),
-	RST_STREAM(3),
+	FIN_STREAM(3),
 	SETTINGS(4),
 	GOAWARY(5),
 	HEADERS(6);
@@ -36,6 +36,14 @@ public enum FrameType {
 	 * @param type integer representation of the frame type
 	 */
 	private FrameType(int type) {
+		this.type = type;
+	}
+	
+	/**
+	 * FrameType constructor
+	 * @param type integer representation of the frame type
+	 */
+	private FrameType(short type) {
 		this.type = type;
 	}
 	
@@ -63,7 +71,7 @@ public enum FrameType {
 		case 2:
 			return SYN_REPLY;
 		case 3:
-			return RST_STREAM;
+			return FIN_STREAM;
 		case 4:
 			return SETTINGS;
 		case 7:

@@ -1,0 +1,105 @@
+/********************************
+ * Authors:  Feng Yang          *
+ * 	         Jonathan Myers     *
+ *           Nathaniel Stickney *
+ * Course:   CSI 5321           *
+ * Date:     3/15/2017          *
+ ********************************/
+
+package serialization;
+
+import serialization.exception.SpeedyException;
+import utility.ByteUtility;
+import utility.ConstUtility;
+
+public class GoAway extends ControlFrame {
+
+	private int lastStreamID;
+
+	public GoAway() {
+		setType(ConstUtility.GOAWAY);
+		setLength(ConstUtility.GOAWAY_DEFAULT_LENGTH);
+	}
+
+	/**
+	 * Constructor for the goaway frame
+	 * 
+	 * @param lastStreamID
+	 */
+	public GoAway(int lastStreamID) {
+		setType(ConstUtility.GOAWAY);
+		setLength(ConstUtility.GOAWAY_DEFAULT_LENGTH);
+		setLastStreamID(lastStreamID);
+
+	}
+
+	/**
+	 * Encode goaway into byte array;
+	 * 
+	 * @return the byte array
+	 */
+	public byte[] encode() {
+		byte[] encodedBytes = new byte[ConstUtility.GOAWAY_FRAME_LENGTH];
+		byte[] header = super.encodeHeader();
+		int index = 0;
+		ByteUtility.copyBytes(encodedBytes, index, header);
+		index += header.length;
+		// Encode last stream id
+		ByteUtility.copyBytes(encodedBytes, index, ByteUtility.uint32ToLittleEndian(lastStreamID));
+		return encodedBytes;
+	}
+
+	public static Frame decode(byte[] encodedBytes) throws SpeedyException {
+		// Decode CFlag
+		int index = 0;
+		boolean cFlag = decodeCFlag(encodedBytes[index]);
+		// Decode version
+		short version = decodeVersion(ByteUtility.byteSubarray(encodedBytes, index, ConstUtility.VERSION_BYTE_LENGTH));
+		index += ConstUtility.VERSION_BYTE_LENGTH;
+		
+		// Decode type
+		short type = (short) ByteUtility
+				.littleEndianToUINT16(ByteUtility.byteSubarray(encodedBytes, index, ConstUtility.TYPE_BYTE_LENGTH));
+		index += ConstUtility.TYPE_BYTE_LENGTH;
+		
+		// Decode flags
+		byte flags = encodedBytes[index];
+		index += ConstUtility.FLAGS_BYTE_LENGTH;
+		// Decode length
+		int length = decodeLength(ByteUtility.byteSubarray(encodedBytes, index, ConstUtility.LENGTH_BYTE_LENGTH));
+		index += ConstUtility.LENGTH_BYTE_LENGTH;
+		//
+		return new GoAway();
+		
+	}
+
+	@Override
+	public String toString() {
+		// TODO
+		throw new UnsupportedOperationException("Goaway.toString()");
+	}
+
+	@Override
+	public boolean equals(Object o) {
+		// TODO
+		throw new UnsupportedOperationException("Goaway.equals()");
+	}
+
+	/**
+	 * Sets the value of the last stream id
+	 * 
+	 * @param lastStreamID
+	 */
+	private void setLastStreamID(int lastStreamID) {
+		this.lastStreamID = lastStreamID;
+	}
+
+	/**
+	 * Gets the value of the last stream id
+	 * 
+	 * @param lastStreamID
+	 */
+	private int getLastStreamID() {
+		return this.lastStreamID;
+	}
+}

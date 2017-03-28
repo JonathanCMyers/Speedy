@@ -8,6 +8,8 @@
 
 package serialization;
 
+import java.nio.ByteBuffer;
+
 import serialization.exception.SpeedyException;
 import utility.ByteUtility;
 
@@ -33,7 +35,14 @@ public abstract class Frame {
 	}
 	
 	public static Frame decode(byte[] encodedBytes) throws SpeedyException {
-		return null;
+		boolean cFlag = decodeCFlag(encodedBytes[0]);
+		Frame frame = null;
+		if(cFlag){//Control frame
+			frame = ControlFrame.decode(encodedBytes);
+		}else{
+			frame = DataFrame.decode(encodedBytes);
+		}
+		return frame;
 	}
 	
 	@Override
@@ -53,16 +62,21 @@ public abstract class Frame {
 	 * Sets the value of CFlag
 	 * @param flag
 	 */
-	public void setCFlag(boolean flag){
-		CFlag = flag;
+	public void setCFlag(int cflag){
+		if(cflag == 0){
+			CFlag = false;
+		}else{
+			CFlag = true;
+		}
 	}
 	
 	/**
 	 * Get the value of CFlag
 	 * @return
 	 */
-	public boolean getCFlag(){
-		return CFlag;
+	public int getCFlag(){
+		if(CFlag) return 1;
+		return 0;
 	}
 	
 	/**
@@ -95,6 +109,40 @@ public abstract class Frame {
 	 * @return
 	 */
 	public int sgtLength(){
+		return length;
+	}
+	
+	/**
+	 * Gets the cFlag
+	 * 
+	 * @param cf
+	 * @return
+	 */
+	protected static boolean decodeCFlag(byte cf) {
+		boolean cFlag = false;
+		if ((cf & 0b10000000) != 0b0000000) {
+			cFlag = true;
+		}
+		return cFlag;
+	}
+	
+	
+	
+	
+	/**
+	 * Decodes the length
+	 * 
+	 * @param value
+	 * @return
+	 */
+	protected static int decodeLength(byte[] value) {
+		if (value.length != 3) {
+			System.err.println("decodeLength error: the length should be 24 bits.");
+		}
+		int length = 0;
+		length += value[0] << 16;
+		length += value[1] << 8;
+		length += value[2];
 		return length;
 	}
 }
