@@ -73,12 +73,7 @@ public class SynStreamTest {
 		new SynStream(0,headerBlock);
 	}
 	
-	@Test(expected=SpeedyException.class)
-	public void testConstructorStreamIDTooLarge() throws SpeedyException {
-		HeaderBlock headerBlock = new HeaderBlock();
-		new SynStream((int)Math.pow(2, 31),headerBlock);
-	}
-	
+		
 	@Test
 	public void testEqualsReflexive() throws SpeedyException {
 		HeaderBlock headerBlock = new HeaderBlock();
