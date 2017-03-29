@@ -8,6 +8,8 @@
 
 package serialization;
 
+import java.util.Arrays;
+
 import serialization.exception.DataFrameException;
 import serialization.exception.SpeedyException;
 import utility.ByteUtility;
@@ -19,15 +21,15 @@ public class DataFrame extends Frame {
 	 * Holds the ID of the Stream in which the frame is Only the last 31 bits
 	 * are used.Including all non-negative integer.
 	 */
-	protected int streamID;
+	private int streamID;
 
 	/**
 	 * Holds the data in the payload.
 	 */
-	byte[] data;
+	private byte[] data;
 
 	/**
-	 * 
+	 * Contructor for DataFrame
 	 * @param streamID
 	 * @throws SpeedyException 
 	 */
@@ -36,7 +38,12 @@ public class DataFrame extends Frame {
 		setData();
 		setLength(data.length);
 	}
-
+	/**
+	 * Constructor for DataFrame
+	 * @param streamID
+	 * @param data
+	 * @throws SpeedyException
+	 */
 	public DataFrame(int streamID, byte[] data) throws SpeedyException {
 		setStreamID(streamID);
 		setData(data);
@@ -115,6 +122,15 @@ public class DataFrame extends Frame {
 			return false;
 		}
 		if(getClass() != obj.getClass()) {
+			return false;
+		}
+		DataFrame objf = (DataFrame) obj;
+		//Check streamID
+		if(this.streamID != objf.getStreamID()){
+			return false;
+		}
+		//Check data
+		if(!Arrays.equals(this.data, objf.getData())){
 			return false;
 		}
 		return true;

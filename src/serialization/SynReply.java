@@ -153,8 +153,10 @@ public class SynReply extends ControlFrame {
 	 */
 	public void setStreamID(int id) throws SpeedyException {
 		if (id <= 0) {
-			System.err.println("Stream ID should be non-negative integer.");
 			throw new SpeedyException("StreamID should be bigger than 0.");
+		}
+		if(id > (int)Math.pow(2, 31) - 1){
+			throw new SpeedyException("StreamID is too large.");
 		}
 		streamID = id;
 	}
@@ -211,9 +213,32 @@ public class SynReply extends ControlFrame {
 	}
 
 	@Override
-	public boolean equals(Object o) {
-		// TODO
-		throw new UnsupportedOperationException("SynStream.equals()");
+	public boolean equals(Object obj) {
+		if(obj == null && this!=null){
+			return false;
+		}
+		if(this == obj) {
+			return true;
+		}
+		if(getClass() != obj.getClass()) {
+			return false;
+		}
+		SynReply ss = (SynReply) obj;
+		if(this.getCFlag() != ss.getCFlag()){
+			return false;
+		}
+		if(this.getStreamID() != ss.getStreamID()){
+			return false;
+		}
+		if(!this.headerBlock.equals(ss.getHeaderBlock())){
+			return false;
+		}
+		
+		if(this.length != ss.getLength()){
+			return false;
+		}
+		
+		return true;
 	}
 
 	/**

@@ -107,9 +107,22 @@ public abstract class Frame {
 	/**
 	 * Sets the length
 	 * @param length
+	 * @throws SpeedyException 
 	 */
-	public void setLength(int length){
+	public void setLength(int length) throws SpeedyException{
+		if(length > Math.pow(2, 24) - 1){
+			throw new SpeedyException("The lenght is too large.");
+		}
 		this.length = length;
+	}
+	
+	
+	/**
+	 * Gets the length
+	 * @param length
+	 */
+	public int getLength( ){
+		return this.length;
 	}
 	
 	/**

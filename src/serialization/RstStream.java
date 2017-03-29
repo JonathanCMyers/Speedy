@@ -12,7 +12,7 @@ import serialization.exception.SpeedyException;
 
 public class RstStream extends ControlFrame {
 	
-	public RstStream() {
+	public RstStream() throws SpeedyException {
 		throw new UnsupportedOperationException("RstStream()");
 	}
 	

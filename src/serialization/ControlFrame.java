@@ -26,7 +26,7 @@ public abstract class ControlFrame extends Frame {
 	 */
 	protected short type;
 
-	public ControlFrame() {
+	public ControlFrame() throws SpeedyException {
 		// The flag of control frame
 		setCFlag(1);
 		setVersion(ConstUtility.VERSION);

@@ -24,6 +24,8 @@ public class SynStreamTest {
 	@Test
 	public void testEncodeDecodeReflexive() throws SpeedyException {
 		HeaderBlock headerBlock = new HeaderBlock();
+		headerBlock.addBlock("Name1","value");
+		headerBlock.addBlock("Name2","value");
 		SynStream s1 = new SynStream(5,headerBlock);
 		byte[] encodedBytes = s1.encode();
 		Frame s2 = Frame.decode(encodedBytes);
@@ -73,7 +75,7 @@ public class SynStreamTest {
 		new SynStream(0,headerBlock);
 	}
 	
-		
+	
 	@Test
 	public void testEqualsReflexive() throws SpeedyException {
 		HeaderBlock headerBlock = new HeaderBlock();
@@ -89,6 +91,19 @@ public class SynStreamTest {
 		assertEquals(s1, s2);
 	}
 	
+	
+	@Test
+	public void testHeaderBlockNotEquals() throws SpeedyException {
+		HeaderBlock headerBlock = new HeaderBlock();
+		HeaderBlock headerBlock1 = new HeaderBlock();
+		headerBlock.addBlock("Name","value");
+		headerBlock1.addBlock("Name","value");
+		SynStream s1 = new SynStream(1,headerBlock);
+		SynStream s2 = new SynStream(1,headerBlock1);
+		s1.setPriority(1);
+		s2.setPriority(2);
+		assertNotEquals(s1, s2);
+	}
 	@Test
 	public void testOneSideNullNotEqual() throws SpeedyException {
 		HeaderBlock headerBlock = new HeaderBlock();

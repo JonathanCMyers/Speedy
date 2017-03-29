@@ -17,7 +17,7 @@ public class GoAway extends ControlFrame {
 
 	private int lastStreamID;
 
-	public GoAway() {
+	public GoAway() throws SpeedyException {
 		setType(ConstUtility.GOAWAY);
 		setLength(ConstUtility.GOAWAY_DEFAULT_LENGTH);
 	}
@@ -36,7 +36,7 @@ public class GoAway extends ControlFrame {
 	}
 
 	/**
-	 * Encode goaway into byte array;
+	 * Encode goaway frame into byte array;
 	 * 
 	 * @return the byte array
 	 */
@@ -64,7 +64,7 @@ public class GoAway extends ControlFrame {
 				.littleEndianToUINT16(ByteUtility.byteSubarray(encodedBytes, index, ConstUtility.TYPE_BYTE_LENGTH));
 		index += ConstUtility.TYPE_BYTE_LENGTH;
 		
-		// Decode flags
+		// Decode flags 
 		byte flags = encodedBytes[index];
 		index += ConstUtility.FLAGS_BYTE_LENGTH;
 		// Decode length

@@ -19,9 +19,8 @@ public class FinStream extends ControlFrame{
 	 * The constructor of the Fin stream frame
 	 * @param streamID
 	 */
-	public FinStream(int streamID){
+	public FinStream(int streamID) throws SpeedyException {
 		setStreamID(streamID);
-		
 		setType(ConstUtility.FIN_STREAM_NUM);
 		setLength();
 	}
@@ -32,7 +31,7 @@ public class FinStream extends ControlFrame{
 	 * @param streamID the stream ID for the frame
 	 * @param statusCode  the status code for the frame
 	 */
-	public FinStream(int streamID,int statusCode){
+	public FinStream(int streamID,int statusCode)throws SpeedyException {
 		setStreamID(streamID);
 		setVersion(ConstUtility.VERSION);
 		setType(ConstUtility.FIN_STREAM_NUM);
