@@ -97,7 +97,11 @@ public class ByteUtility {
 		byte[] returnBytes = new byte[length];
 		int count = 0;
 		for(int i = startingIndex; i < startingIndex + length; i++, count++) {
-			returnBytes[count] = bytes[i];
+			try {
+				returnBytes[count] = bytes[i];
+			} catch(ArrayIndexOutOfBoundsException e) {
+				throw new ArrayIndexOutOfBoundsException(e.getMessage() + "; i: " + i + "; length: " + length);
+			}
 		}
 		return returnBytes;
 	}

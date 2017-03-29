@@ -85,7 +85,7 @@ public class Server {
 		FileHandler fileHandler = new FileHandler("connections.log");
 		
 		// Create a Logger for logging whatever the Server needs to do
-		Logger logger = Logger.getLogger("practical");
+		logger = Logger.getLogger("practical");
 		logger.addHandler(fileHandler);
 		logger.setUseParentHandlers(false);
 	}

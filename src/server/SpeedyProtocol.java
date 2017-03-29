@@ -17,6 +17,7 @@ import java.util.logging.Logger;
 
 import serialization.Frame;
 import serialization.GoAway;
+import serialization.SynStream;
 import serialization.exception.ServerBreakException;
 import serialization.exception.ServerContinueException;
 import serialization.exception.SpeedyException;
@@ -71,7 +72,22 @@ public class SpeedyProtocol implements Runnable {
 			logger.info("Handling client " + clientSock.getInetAddress() + "-" + clientSock.getPort() + 
 					" with thread id " + Thread.currentThread().getId() + "\n");
 
+			int count = 1;
 			while(true) {
+				
+				if(count%5000 == 0) {
+					try {
+						SynStream s = new SynStream(2);
+						byte[] encodedBytes = s.encode();
+						out.write(encodedBytes);
+					} catch (SpeedyException e) {
+						System.err.println("Could not initialize SynStream!" + e.getMessage());
+					} catch (IOException e) {
+						System.err.println("Could not send SynStream to Client!" + e.getMessage());
+					} 
+				}
+				
+				count++;
 				//Frame fm = receiveFrame();
 				
 				/*

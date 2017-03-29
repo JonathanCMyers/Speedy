@@ -96,4 +96,18 @@ public class SynStreamTest {
 		SynStream s2 = new SynStream(1,headerBlock);
 		assertNotEquals(s1, s2);
 	}
+	
+	@Test
+	public void testDoubleDecode() throws SpeedyException {
+		
+		SynStream s1 = new SynStream(2);
+		byte[] encodedBytes1 = s1.encode();
+		assertEquals(s1, (SynStream) (Frame.decode(encodedBytes1)));
+			
+			
+		SynStream s2 = new SynStream(4);
+		byte[] encodedBytes2 = s2.encode();
+		assertEquals(s2, (SynStream) Frame.decode(encodedBytes2));
+		
+	}
 }

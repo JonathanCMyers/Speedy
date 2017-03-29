@@ -16,6 +16,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 
 import serialization.Frame;
+import serialization.SynStream;
 import serialization.exception.SpeedyException;
 import utility.SpeedyUtility;
 
@@ -63,7 +64,7 @@ public class FrameReceiver implements Runnable {
 				System.err.println("Error reading frame from server: " + e.getMessage());
 			}
 			if(f != null) {
-				frameQueue.add(f);
+				frameQueue.add((SynStream)f);
 				System.out.println("Frame added!");
 			}
 		}
