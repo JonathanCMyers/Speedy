@@ -4,6 +4,7 @@
  *           Nathaniel Stickney *
  * Course:   CSI 5321           *
  * Date:     3/15/2017          *
+ * Update:   3/28/2017          *
  ********************************/
 
 package serialization;
@@ -150,11 +151,12 @@ public class SynReply extends ControlFrame {
 	 * @param streamID
 	 * @throws SpeedyException 
 	 */
-	public void setStreamID(int streamID) throws SpeedyException {
-		if(streamID <=0){
-			throw new SpeedyException("StreamID should be biger than 0.");
+	public void setStreamID(int id) throws SpeedyException {
+		if (id <= 0) {
+			System.err.println("Stream ID should be non-negative integer.");
+			throw new SpeedyException("StreamID should be bigger than 0.");
 		}
-		this.streamID = streamID;
+		streamID = id;
 	}
 
 	/**

@@ -29,14 +29,15 @@ public class DataFrame extends Frame {
 	/**
 	 * 
 	 * @param streamID
+	 * @throws SpeedyException 
 	 */
-	public DataFrame(int streamID) {
+	public DataFrame(int streamID) throws SpeedyException {
 		setStreamID(streamID);
 		setData();
 		setLength(data.length);
 	}
 
-	public DataFrame(int streamID, byte[] data) {
+	public DataFrame(int streamID, byte[] data) throws SpeedyException {
 		setStreamID(streamID);
 		setData(data);
 		setLength(data.length);
@@ -89,6 +90,9 @@ public class DataFrame extends Frame {
 	}
 
 	public static DataFrame decode(byte[] encodedBytes) throws SpeedyException {
+		if(encodedBytes == null || encodedBytes.length < ConstUtility.DATA_STREAM_HEADER_LENGTH){
+			throw new SpeedyException("EncodedBytes is illigal.");
+		}
 		int index = 0;
 		int streamID = ByteUtility.littleEndianToUINT32(ByteUtility.byteSubarray(encodedBytes, index, Integer.SIZE/8));
 		byte[] data = ByteUtility.byteSubarray(encodedBytes, ConstUtility.DATA_STREAM_HEADER_LENGTH, encodedBytes.length - ConstUtility.DATA_STREAM_HEADER_LENGTH);
@@ -100,21 +104,33 @@ public class DataFrame extends Frame {
 		// TODO
 		throw new UnsupportedOperationException("DataFrame.toString()");
 	}
-
+	/**
+	 * Check current object equals to the obj
+	 */
 	@Override
-	public boolean equals(Object o) {
-		// TODO
-		throw new UnsupportedOperationException("DataFrame.equals()");
+	public boolean equals(Object obj) {
+		if(this == obj) {
+			return true;
+		}
+		if(!super.equals(obj)) {
+			return false;
+		}
+		if(getClass() != obj.getClass()) {
+			return false;
+		}
+		return true;
 	}
 
 	/**
 	 * Assigns the a value to streamID in the frame
 	 * 
 	 * @param id
+	 * @throws SpeedyException 
 	 */
-	public void setStreamID(int id) {
-		if (id < 0) {
+	public void setStreamID(int id) throws SpeedyException {
+		if (id <= 0) {
 			System.err.println("Stream ID should be non-negative integer.");
+			throw new SpeedyException("StreamID should be bigger than 0.");
 		}
 		streamID = id;
 	}
