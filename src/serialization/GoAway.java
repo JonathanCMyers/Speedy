@@ -4,6 +4,7 @@
  *           Nathaniel Stickney *
  * Course:   CSI 5321           *
  * Date:     3/15/2017          *
+ * Update:   3/28/2017          *
  ********************************/
 
 package serialization;
@@ -25,8 +26,9 @@ public class GoAway extends ControlFrame {
 	 * Constructor for the goaway frame
 	 * 
 	 * @param lastStreamID
+	 * @throws SpeedyException 
 	 */
-	public GoAway(int lastStreamID) {
+	public GoAway(int lastStreamID) throws SpeedyException {
 		setType(ConstUtility.GOAWAY);
 		setLength(ConstUtility.GOAWAY_DEFAULT_LENGTH);
 		setLastStreamID(lastStreamID);
@@ -89,8 +91,13 @@ public class GoAway extends ControlFrame {
 	 * Sets the value of the last stream id
 	 * 
 	 * @param lastStreamID
+	 * @throws SpeedyException 
 	 */
-	private void setLastStreamID(int lastStreamID) {
+	private void setLastStreamID(int lastStreamID) throws SpeedyException {
+		if (lastStreamID <= 0) {
+			System.err.println("Stream ID should be non-negative integer.");
+			throw new SpeedyException("StreamID should be bigger than 0.");
+		}
 		this.lastStreamID = lastStreamID;
 	}
 
@@ -102,4 +109,6 @@ public class GoAway extends ControlFrame {
 	private int getLastStreamID() {
 		return this.lastStreamID;
 	}
+	
+	
 }

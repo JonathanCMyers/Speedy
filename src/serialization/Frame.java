@@ -53,9 +53,20 @@ public abstract class Frame {
 	
 	
 	@Override
-	public boolean equals(Object o) {
-		// TODO
-		throw new UnsupportedOperationException("Frame.equals()");
+	public boolean equals(Object obj) {
+		if(obj == null){
+			return false;
+		}
+		if (this == obj) {
+			return true;
+		}
+		if (getClass() != obj.getClass()) {
+			return false;
+		}
+		if (!super.equals(obj)) {
+			return false;
+		}
+		return true;
 	}
 	
 	/**
