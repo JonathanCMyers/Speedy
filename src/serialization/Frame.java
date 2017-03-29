@@ -63,9 +63,6 @@ public abstract class Frame {
 		if (getClass() != obj.getClass()) {
 			return false;
 		}
-		if (!super.equals(obj)) {
-			return false;
-		}
 		return true;
 	}
 	

@@ -101,8 +101,7 @@ public class DataFrame extends Frame {
 
 	@Override
 	public String toString() {
-		// TODO
-		throw new UnsupportedOperationException("DataFrame.toString()");
+		return "[DataFrame]: [ID = " + streamID + "]";
 	}
 	/**
 	 * Check current object equals to the obj
@@ -129,8 +128,10 @@ public class DataFrame extends Frame {
 	 */
 	public void setStreamID(int id) throws SpeedyException {
 		if (id <= 0) {
-			System.err.println("Stream ID should be non-negative integer.");
 			throw new SpeedyException("StreamID should be bigger than 0.");
+		}
+		if(id > (int) Math.pow(2, 31) - 1) {
+			throw new SpeedyException("StreamID is too large. Cannot be greater than 2^31 - 1");
 		}
 		streamID = id;
 	}

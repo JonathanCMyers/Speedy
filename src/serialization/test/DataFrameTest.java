@@ -87,14 +87,15 @@ public class DataFrameTest {
 		String data = "data";
 		DataFrame d1 = new DataFrame(5, data.getBytes());
 		DataFrame d2 = new DataFrame(5, data.getBytes());
-		byte[] db1 = d1.encode();
-		byte[] db2 = d2.encode();
-		for (int i = 0;i < db1.length;i++) {
-			    System.out.print(Integer.toBinaryString(db1[i] & 255 | 256).substring(1));
-			    System.out.println("  "+Integer.toBinaryString(db2[i] & 255 | 256).substring(1));
-			}
-		assertEquals(new DataFrame(5, data.getBytes()),new DataFrame(5, data.getBytes()));
-		//assertEquals(d1, d2);
+		assertEquals(d1, d2);
+	}
+	
+	@Test
+	public void testNotEqualsDifferentID() throws SpeedyException {
+		String data = "data";
+		DataFrame d1 = new DataFrame(5, data.getBytes());
+		DataFrame d2 = new DataFrame(6, data.getBytes());
+		assertNotEquals(d1, d2);
 	}
 
 	@Test
@@ -102,6 +103,24 @@ public class DataFrameTest {
 		String data = "data";
 		DataFrame d1 = new DataFrame(5, data.getBytes());
 		DataFrame d2 = null;
+		assertNotEquals(d1, d2);
+	}
+	
+	@Test
+	public void testOneSideNullNotEqualStringLength() throws SpeedyException {
+		String data = "data";
+		String data2 = "dataa";
+		DataFrame d1 = new DataFrame(5, data.getBytes());
+		DataFrame d2 = new DataFrame(5, data2.getBytes());
+		assertNotEquals(d1, d2);
+	}
+	
+	@Test
+	public void testOneSideNullNotEqualStringDifferent() throws SpeedyException {
+		String data = "data";
+		String data2 = "bbbb";
+		DataFrame d1 = new DataFrame(5, data.getBytes());
+		DataFrame d2 = new DataFrame(5, data2.getBytes());
 		assertNotEquals(d1, d2);
 	}
 }
