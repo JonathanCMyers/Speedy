@@ -8,6 +8,7 @@
 package serialization;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import serialization.exception.SpeedyException;
@@ -35,9 +36,10 @@ public class HeaderBlock {
 
 	/**
 	 * Add new block into the headerBlock
+	 * @throws SpeedyException 
 	 */
 
-	public void addBlock(String name, String value) {
+	public void addBlock(String name, String value) throws SpeedyException {
 		Block block = new Block(name, value);
 		numOfPairs++;
 		blocksList.add(block);
@@ -90,8 +92,9 @@ public class HeaderBlock {
 	 * Decodes the headerBlock
 	 * @param encodedHeaderBlock
 	 * @return
+	 * @throws SpeedyException 
 	 */
-	public static HeaderBlock decode(byte[] encodedHeaderBlock ){
+	public static HeaderBlock decode(byte[] encodedHeaderBlock ) throws SpeedyException{
 		HeaderBlock headerBlock = new HeaderBlock();
 		int index = 0;
 		//Decode numOfPairs
@@ -100,8 +103,8 @@ public class HeaderBlock {
 			short lengthOfName = ByteUtility.littleEndianToUINT16(
 					ByteUtility.byteSubarray(encodedHeaderBlock, index, ConstUtility.BLOCK_NAME_LENGTH_LENGTH));
 			short lengthOfValue = ByteUtility.littleEndianToUINT16(
-					ByteUtility.byteSubarray(encodedHeaderBlock, index + lengthOfName*2 + ConstUtility.BLOCK_NAME_LENGTH_LENGTH, ConstUtility.BLOCK_VALUE_LENGTH_LENGTH));
-			int lengthOfBlock = ConstUtility.BLOCK_NAME_LENGTH_LENGTH + lengthOfName*2 + ConstUtility.BLOCK_VALUE_LENGTH_LENGTH + lengthOfValue*2;
+					ByteUtility.byteSubarray(encodedHeaderBlock, index + lengthOfName + ConstUtility.BLOCK_NAME_LENGTH_LENGTH, ConstUtility.BLOCK_VALUE_LENGTH_LENGTH));
+			int lengthOfBlock = ConstUtility.BLOCK_NAME_LENGTH_LENGTH + lengthOfName + ConstUtility.BLOCK_VALUE_LENGTH_LENGTH + lengthOfValue;
 			Block block = Block.decode(ByteUtility.byteSubarray(encodedHeaderBlock, index, lengthOfBlock));
 			headerBlock.addBlock(block);
 			numOfPairs++;
@@ -133,5 +136,38 @@ public class HeaderBlock {
 		return length;
 	}
 	
+	
+	/**
+	 * Check current object equals to the obj
+	 */
+	@Override
+	public boolean equals(Object obj) {
+		
+		if(obj == null && this!=null){
+			return false;
+		}
+		if(this == obj) {
+			return true;
+		}
+		if(getClass() != obj.getClass()) {
+			return false;
+		}
+		HeaderBlock hb = (HeaderBlock) obj;
+		if(this.numOfPairs == 0 && hb.getNumOfPairs() == 0){
+			return true;
+		}
+		
+		if(this.numOfPairs!=hb.getNumOfPairs()){
+			return false;
+		}
+		
+		for(int i = 0; i < numOfPairs;i++){
+			if(!this.blocksList.get(i).equals(hb.getBlocksList().get(i))){
+				return false;
+			}
+		}
+		return true;
+	}
+
 	
 }

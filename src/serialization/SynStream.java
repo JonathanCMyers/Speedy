@@ -55,7 +55,11 @@ public class SynStream extends ControlFrame {
 	 * @param streamID
 	 */
 	private HeaderBlock headerBlock;
-
+	/**
+	 * Constructor for SynStream without HeaderBlock
+	 * @param streamID
+	 * @throws SpeedyException
+	 */
 	public SynStream(int streamID) throws SpeedyException {
 		headerBlock = new HeaderBlock();
 		setStreamID(streamID);
@@ -66,7 +70,12 @@ public class SynStream extends ControlFrame {
 		setNumOfPairs(ConstUtility.NUMBER_OF_PAIRS_DEFAULT);
 
 	}
-
+	/**
+	 * Constructor for SynStream
+	 * @param streamID
+	 * @param headerBlock
+	 * @throws SpeedyException
+	 */
 	public SynStream(int streamID, HeaderBlock headerBlock) throws SpeedyException {
 		
 		setHeaderBlock(headerBlock);
@@ -157,6 +166,11 @@ public class SynStream extends ControlFrame {
 				.decode(ByteUtility.byteSubarray(encodedBytes, index, encodedBytes.length - index));
 
 		SynStream frame = new SynStream(streamId, headerBlock);
+		frame.setPriority(priority);
+		frame.setLength(length);
+		frame.setFlags(flags);
+		frame.setVersion(version);
+		
 		return frame;
 	}
 
@@ -168,8 +182,10 @@ public class SynStream extends ControlFrame {
 	 */
 	public void setStreamID(int id) throws SpeedyException {
 		if (id <= 0) {
-			System.err.println("Stream ID should be non-negative integer.");
 			throw new SpeedyException("StreamID should be bigger than 0.");
+		}
+		if(id >= (int)Math.pow(2, 31)){
+			throw new SpeedyException("StreamID is too large.");
 		}
 		streamID = id;
 	}
@@ -256,9 +272,34 @@ public class SynStream extends ControlFrame {
 	}
 
 	@Override
-	public boolean equals(Object o) {
-		// TODO
-		throw new UnsupportedOperationException("SynStream.equals()");
+	public boolean equals(Object obj) {
+		if(obj == null && this!=null){
+			return false;
+		}
+		if(this == obj) {
+			return true;
+		}
+		if(getClass() != obj.getClass()) {
+			return false;
+		}
+		SynStream ss = (SynStream) obj;
+		if(this.getCFlag() != ss.getCFlag()){
+			return false;
+		}
+		if(this.getStreamID() != ss.getStreamID()){
+			return false;
+		}
+		if(!this.headerBlock.equals(ss.getHeaderBlock())){
+			return false;
+		}
+		if(this.priority != ss.getPriority()){
+			return false;
+		}
+		if(this.length != ss.getLength()){
+			return false;
+		}
+		
+		return true;
 	}
 
 	/**
