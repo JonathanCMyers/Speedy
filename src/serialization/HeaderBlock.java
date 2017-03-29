@@ -44,7 +44,7 @@ public class HeaderBlock {
 		numOfPairs++;
 		blocksList.add(block);
 		length += ConstUtility.BLOCK_NAME_LENGTH_LENGTH + ConstUtility.BLOCK_VALUE_LENGTH_LENGTH +
-				block.getName().length() * 2 + block.getValue().length() * 2;
+				block.getName().length() + block.getValue().length();
 	}
 	
 	/**
@@ -55,7 +55,7 @@ public class HeaderBlock {
 		numOfPairs++;
 		blocksList.add(block);
 		length += ConstUtility.BLOCK_NAME_LENGTH_LENGTH + ConstUtility.BLOCK_VALUE_LENGTH_LENGTH +
-				block.getName().length() * 2 + block.getValue().length() * 2;
+				block.getName().length() + block.getValue().length();
 	}
 
 	/**

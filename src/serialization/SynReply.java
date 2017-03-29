@@ -33,11 +33,6 @@ public class SynReply extends ControlFrame {
 	private byte slot;
 
 	/**
-	 * Holds the length of the header in the frame
-	 */
-	private final static int lengthOfHeader = 16;
-
-	/**
 	 * Holds the number of name/value pairs
 	 */
 	private short numOfPairs;
@@ -64,7 +59,8 @@ public class SynReply extends ControlFrame {
 		setType(ConstUtility.SYN_REPLY_NUM);
 		setVersion(ConstUtility.VERSION);
 		setNumOfPairs(headerBlock.getNumOfPairs());
-		setLengthData(ConstUtility.SYNSTREAM_HEADER_LENGTH + headerBlock.getLength());
+		System.out.println("SynLength:" + ConstUtility.SYNSTREAM_HEADER_LENGTH +","+ headerBlock.getLength());
+		setLengthData(ConstUtility.SYNSTREAM_DEFAULT_DATA_LENGTH + headerBlock.getLength());
 	}
 
 	/**
@@ -124,6 +120,7 @@ public class SynReply extends ControlFrame {
 		// Decode flags
 		byte flags = encodedBytes[index];
 		index += ConstUtility.FLAGS_BYTE_LENGTH;
+		System.out.println("index"+index);
 		// Decode length
 		int length = decodeLength(ByteUtility.byteSubarray(encodedBytes, index, ConstUtility.LENGTH_BYTE_LENGTH));
 		index += ConstUtility.LENGTH_BYTE_LENGTH;
@@ -141,6 +138,8 @@ public class SynReply extends ControlFrame {
 				.decode(ByteUtility.byteSubarray(encodedBytes, index, encodedBytes.length - index));
 
 		SynReply frame = new SynReply(streamId, headerBlock);
+		frame.setLength(length);
+		frame.setFlags(flags);
 		return frame;
 
 	}
@@ -208,8 +207,7 @@ public class SynReply extends ControlFrame {
 
 	@Override
 	public String toString() {
-		// TODO
-		throw new UnsupportedOperationException("SynStream.toString()");
+		return new String("[StreamID,"+streamID +"]");
 	}
 
 	@Override
@@ -224,6 +222,10 @@ public class SynReply extends ControlFrame {
 			return false;
 		}
 		SynReply ss = (SynReply) obj;
+		
+		if(this.length != ss.getLength()){
+			return false;
+		}
 		if(this.getCFlag() != ss.getCFlag()){
 			return false;
 		}
@@ -234,9 +236,7 @@ public class SynReply extends ControlFrame {
 			return false;
 		}
 		
-		if(this.length != ss.getLength()){
-			return false;
-		}
+		
 		
 		return true;
 	}

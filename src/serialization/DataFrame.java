@@ -36,7 +36,7 @@ public class DataFrame extends Frame {
 	public DataFrame(int streamID) throws SpeedyException {
 		setStreamID(streamID);
 		setData();
-		setLength(data.length);
+		setLength(ConstUtility.DEFAULT_DATA_LENGTH);
 	}
 	/**
 	 * Constructor for DataFrame
@@ -93,6 +93,7 @@ public class DataFrame extends Frame {
 		index += fl.length;
 		//Encode data
 		ByteUtility.copyBytes(encodedBytes, index, data);
+		
 		return encodedBytes;
 	}
 
@@ -101,7 +102,7 @@ public class DataFrame extends Frame {
 			throw new SpeedyException("EncodedBytes is illigal.");
 		}
 		int index = 0;
-		int streamID = ByteUtility.littleEndianToUINT32(ByteUtility.byteSubarray(encodedBytes, index, Integer.SIZE/8));
+		int streamID = ByteUtility.littleEndianToUINT32(ByteUtility.byteSubarray(encodedBytes, index, ConstUtility.STREAMID_BYTE_LENGTH));
 		byte[] data = ByteUtility.byteSubarray(encodedBytes, ConstUtility.DATA_STREAM_HEADER_LENGTH, encodedBytes.length - ConstUtility.DATA_STREAM_HEADER_LENGTH);
 		return new DataFrame(streamID,data);
 	}
@@ -115,6 +116,7 @@ public class DataFrame extends Frame {
 	 */
 	@Override
 	public boolean equals(Object obj) {
+		
 		if(this == obj) {
 			return true;
 		}
@@ -161,19 +163,5 @@ public class DataFrame extends Frame {
 		return streamID;
 	}
 	
-	/**
-	 * Turn flags and length into byte array
-	 * 
-	 * @param flags
-	 * @param length
-	 * @return
-	 */
-	private byte[] getBytesFL(byte flags, int length) {
-		byte[] fl = new byte[4];
-		fl[0] = flags;
-		fl[1] = (byte) (length >> 8 & 0b11111111);
-		fl[2] = (byte) (length >> 16 & 0b11111111);
-		fl[3] = (byte) (length >> 24 & 0b11111111);
-		return fl;
-	}
+	
 }

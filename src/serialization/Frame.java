@@ -8,10 +8,12 @@
 
 package serialization;
 
+import java.io.IOException;
 import java.nio.ByteBuffer;
 
 import serialization.exception.SpeedyException;
 import utility.ByteUtility;
+import utility.ConstUtility;
 
 public abstract class Frame {
 	/**
@@ -34,9 +36,31 @@ public abstract class Frame {
 		return encodeBytes;
 	}
 	
-	public static Frame decode(byte[] encodedBytes) throws SpeedyException {
-		boolean cFlag = decodeCFlag(encodedBytes[0]);
+	public static Frame decodeFrame(MessageInput msgIn) throws SpeedyException {
+		int index = 0;
+		index += ConstUtility.FLAGS_BYTE_LENGTH;
+		//Get the first 8 bytes for the header of the frame
+		byte[] header = null;
+		try {
+			header = msgIn.getNumberBytes(ConstUtility.FRAME_HEADER_LENGTH);
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		int dataLength = decodeLength(ByteUtility.byteSubarray(header, header.length - ConstUtility.LENGTH_BYTE_LENGTH, ConstUtility.LENGTH_BYTE_LENGTH));
+		System.out.println("dataLength:" + dataLength);
+		boolean cFlag = decodeCFlag(header[0]);
 		Frame frame = null;
+		
+		int frame_length = ConstUtility.FRAME_HEADER_LENGTH + dataLength;
+		byte[] encodedBytes = new byte[frame_length];
+		index = 0;
+		ByteUtility.copyBytes(encodedBytes, index, header);
+		index += header.length;
+		try {
+			ByteUtility.copyBytes(encodedBytes, index, msgIn.getNumberBytes(dataLength));
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
 		if(cFlag){//Control frame
 			frame = ControlFrame.decode(encodedBytes);
 		}else{
@@ -44,6 +68,8 @@ public abstract class Frame {
 		}
 		return frame;
 	}
+	
+	
 	
 	@Override
 	public String toString() {
@@ -160,10 +186,45 @@ public abstract class Frame {
 		if (value.length != 3) {
 			System.err.println("decodeLength error: the length should be 24 bits.");
 		}
+		
+		for (int i = 0;i < 3;i++) {
+			    System.out.println(Integer.toBinaryString(value[i] & 255 | 256).substring(1));
+			}
 		int length = 0;
 		length += value[0] << 16;
 		length += value[1] << 8;
 		length += value[2];
+		
 		return length;
+	}
+	
+	/**
+	 * Turn flags and length into byte array
+	 * 
+	 * @param flags
+	 * @param length
+	 * @return
+	 */
+	protected byte[] getBytesFL(byte flags, int length) {
+		byte[] fl = new byte[4];
+		fl[0] = flags;
+		fl[3] = (byte) (length & 0b11111111);
+		fl[2] = (byte) (length >> 8 & 0b11111111);
+		fl[1] = (byte) (length >> 16 & 0b11111111);
+		return fl;
+	}
+
+	/**
+	 * Decodes the version
+	 * 
+	 * @param value
+	 * @return
+	 */
+	protected static short decodeVersion(byte[] value) {
+
+		short version = 0;
+		value[0] &= 0b01111111;
+		version = ByteBuffer.wrap(value).getShort();
+		return version;
 	}
 }

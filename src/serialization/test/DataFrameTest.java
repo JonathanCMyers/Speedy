@@ -10,13 +10,16 @@ package serialization.test;
 
 import static org.junit.Assert.*;
 
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 
 import org.junit.Test;
 
 import serialization.DataFrame;
 import serialization.Frame;
 import serialization.HeaderBlock;
+import serialization.MessageInput;
 import serialization.DataFrame;
 import serialization.exception.SpeedyException;
 
@@ -26,9 +29,11 @@ public class DataFrameTest {
 		String data = "data";
 		DataFrame d1 = new DataFrame(5, data.getBytes());
 		byte[] encodedBytes = d1.encode();
-		Frame d2 = Frame.decode(encodedBytes);
+		InputStream in = new ByteArrayInputStream(encodedBytes);
+		MessageInput msgin = new MessageInput(in);
+		Frame d2 = Frame.decodeFrame(msgin);
 		DataFrame df = (DataFrame) d2;
-		System.out.println(new String(df.getData()));
+		
 		assertEquals(d1, (DataFrame) d2);
 	}
 

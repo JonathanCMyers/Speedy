@@ -10,12 +10,15 @@ package serialization.test;
 
 import static org.junit.Assert.*;
 
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 
 import org.junit.Test;
 
 import serialization.Frame;
 import serialization.HeaderBlock;
+import serialization.MessageInput;
 import serialization.SynReply;
 import serialization.SynReply;
 import serialization.exception.SpeedyException;
@@ -29,8 +32,11 @@ public class SynReplyTest {
 		headerBlock.addBlock("Name2","value");
 		SynReply s1 = new SynReply(5,headerBlock);
 		byte[] encodedBytes = s1.encode();
-		Frame s2 = Frame.decode(encodedBytes);
-		assertEquals(s1, (SynReply)s2);
+		InputStream in = new ByteArrayInputStream(encodedBytes);
+		MessageInput msgin = new MessageInput(in);
+		SynReply s2 =(SynReply) Frame.decodeFrame(msgin);
+		//System.out.println(s2.getHeaderBlock().getBlocksList().get(1));
+		assertEquals(s1, s2);
 	}
 	
 	@Test(expected=SpeedyException.class)

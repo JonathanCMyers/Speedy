@@ -136,35 +136,7 @@ public abstract class ControlFrame extends Frame {
 		return cvt;
 	}
 
-	/**
-	 * Turn flags and length into byte array
-	 * 
-	 * @param flags
-	 * @param length
-	 * @return
-	 */
-	protected byte[] getBytesFL(byte flags, int length) {
-		byte[] fl = new byte[4];
-		fl[0] = flags;
-		fl[3] = (byte) (length & 0b11111111);
-		fl[2] = (byte) (length >> 8 & 0b11111111);
-		fl[1] = (byte) (length >> 16 & 0b11111111);
-		return fl;
-	}
-
-	/**
-	 * Decodes the version
-	 * 
-	 * @param value
-	 * @return
-	 */
-	protected static short decodeVersion(byte[] value) {
-
-		short version = 0;
-		value[0] &= 0b01111111;
-		version = ByteBuffer.wrap(value).getShort();
-		return version;
-	}
+	
 
 	/**
 	 * Encode header of the control frame
