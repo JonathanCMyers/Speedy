@@ -14,7 +14,7 @@ import java.io.IOException;
 
 import org.junit.Test;
 
-import serialization.Goaway;
+import serialization.GoAway;
 
 public class GoawayTest {
 

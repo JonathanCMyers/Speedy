@@ -148,6 +148,19 @@ public class ByteUtility {
 		return new String(stringBytes);
 	}
 	
+	/**
+	 * Converts a String into littleEndian notation
+	 * @param value to be converted into little endian byte form
+	 * @return bytes the converted long value
+	 */
+	public static byte[] stringToLittleEndian(String value) {
+		byte[] bytes = new byte[value.length()];
+		byte[] valueBytes = value.getBytes();
+		for(int i = 0; i < value.length(); i++) {
+			bytes[i] = valueBytes[value.length() - 1 - i];
+		}
+		return bytes;
+	}
 	
 	/**
 	 * Copies the given byte array into a new byte array of the given new size

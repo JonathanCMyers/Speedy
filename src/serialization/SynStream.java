@@ -8,9 +8,11 @@
 
 package serialization;
 
+import java.nio.ByteBuffer;
+
 import serialization.exception.SpeedyException;
 import utility.ByteUtility;
-import utility.SpeedyUtility;
+import utility.ConstUtility;
 
 public class SynStream extends ControlFrame {
 	/**
@@ -53,25 +55,40 @@ public class SynStream extends ControlFrame {
 	 */
 	private HeaderBlock headerBlock;
 
-	public SynStream(int streamID,HeaderBlock headerBlock) {
+	public SynStream(int streamID) throws SpeedyException {
+		headerBlock = new HeaderBlock();
+		setStreamID(streamID);
+		setType(ConstUtility.SYN_STREAM_NUM);
+		setVersion(ConstUtility.VERSION);
+		setPriority(ConstUtility.SYN_STREAM_DEFUALT_PRIORITY);
+		setDefaultDataLength();
+		setNumOfPairs(ConstUtility.NUMBER_OF_PAIRS_DEFAULT);
+
+	}
+
+	public SynStream(int streamID, HeaderBlock headerBlock) throws SpeedyException {
+		
 		setHeaderBlock(headerBlock);
 		setStreamID(streamID);
-		setType(SpeedyUtility.SYN_STREAM_NUM);
-		setVersion(SpeedyUtility.VERSION);
-		setPriority(SpeedyUtility.SYN_STREAM_DEFUALT_PRIORITY);
+		setType(ConstUtility.SYN_STREAM_NUM);
+		setVersion(ConstUtility.VERSION);
+		setPriority(ConstUtility.SYN_STREAM_DEFUALT_PRIORITY);
 		setNumOfPairs(headerBlock.getNumOfPairs());
-		
+		setLengthData(ConstUtility.SYNSTREAM_HEADER_LENGTH + headerBlock.getLength());
 	}
+
 	/**
 	 * Encodes the SYN_STREAM into byte array
+	 * 
 	 * @return byte array
 	 */
 	public byte[] encode() {
 		byte[] encodedBytes = super.encode();
-		byte[] encodedHeader;
+
 		try {
-			encodedHeader = headerBlock.encode();
-			int lengthOfEncode = lengthOfHeader + encodedHeader.length;
+			// Encodes the header block
+			byte[] encodedHeader = headerBlock.encode();
+			int lengthOfEncode = ConstUtility.SYNSTREAM_HEADER_LENGTH + encodedHeader.length;
 			encodedBytes = ByteUtility.lengthenBytes(encodedBytes, lengthOfEncode);
 			int index = 0;
 			// Encode CFlag,Version,Type(4 bytes)
@@ -86,13 +103,12 @@ public class SynStream extends ControlFrame {
 			byte[] streamid = ByteUtility.uint32ToLittleEndian(streamID);
 			ByteUtility.copyBytes(encodedBytes, index, streamid);
 			index += streamid.length;
-			//Encode Priority and numOfPairs
-			byte[] pn = getBytesPN(priority,numOfPairs);
+			// Encode Priority and numOfPairs
+			byte[] pn = getBytesPN(priority, numOfPairs);
 			ByteUtility.copyBytes(encodedBytes, index, pn);
 			index += pn.length;
 			// Encode HeaderBlock
-			byte[] header = headerBlock.encode();
-			ByteUtility.copyBytes(encodedBytes, index, header);
+			ByteUtility.copyBytes(encodedBytes, index, encodedHeader);
 
 		} catch (SpeedyException e) {
 			// TODO Auto-generated catch block
@@ -103,43 +119,56 @@ public class SynStream extends ControlFrame {
 	}
 
 	public static Frame decode(byte[] encodedBytes) throws SpeedyException {
+		if(encodedBytes == null || encodedBytes.length < ConstUtility.SYNSTREAM_HEADER_LENGTH){
+			throw new SpeedyException("The byte array is illegal.");
+		}
+		
 		// Decode CFlag
 		int index = 0;
 		boolean cFlag = decodeCFlag(encodedBytes[0]);
 		// Decode version
-		short version = decodeVersion(ByteUtility.byteSubarray(encodedBytes, index, SpeedyUtility.VERSION_BYTE_LENGTH));
-		index += SpeedyUtility.VERSION_BYTE_LENGTH;
+		short version = decodeVersion(ByteUtility.byteSubarray(encodedBytes, index, ConstUtility.VERSION_BYTE_LENGTH));
+		index += ConstUtility.VERSION_BYTE_LENGTH;
 		// Decode type
 		short type = (short) ByteUtility
-				.littleEndianToUINT16(ByteUtility.byteSubarray(encodedBytes, index, SpeedyUtility.TYPE_BYTE_LENGTH));
-		index += SpeedyUtility.TYPE_BYTE_LENGTH;
+				.littleEndianToUINT16(ByteUtility.byteSubarray(encodedBytes, index, ConstUtility.TYPE_BYTE_LENGTH));
+		index += ConstUtility.TYPE_BYTE_LENGTH;
 		// Decode flags
 		byte flags = encodedBytes[index];
-		index += SpeedyUtility.FLAGS_BYTE_LENGTH;
+		index += ConstUtility.FLAGS_BYTE_LENGTH;
 		// Decode length
-		int length = decodeLength(ByteUtility.byteSubarray(encodedBytes, index, SpeedyUtility.LENGTH_BYTE_LENGTH));
-		index += SpeedyUtility.LENGTH_BYTE_LENGTH;
-		//Decode streamID
-		int streamId = ByteUtility.littleEndianToUINT32(ByteUtility.byteSubarray(encodedBytes, index, SpeedyUtility.STREAMID_BYTE_LENGTH));
-		index += SpeedyUtility.STREAMID_BYTE_LENGTH;
-		//Decode Priority
-		
-		//Decode numOfPairs
+		int length = decodeLength(ByteUtility.byteSubarray(encodedBytes, index, ConstUtility.LENGTH_BYTE_LENGTH));
+		index += ConstUtility.LENGTH_BYTE_LENGTH;
+		// Decode streamID
+		int streamId = ByteUtility.littleEndianToUINT32(
+				ByteUtility.byteSubarray(encodedBytes, index, ConstUtility.STREAMID_BYTE_LENGTH));
+		index += ConstUtility.STREAMID_BYTE_LENGTH;
+		// Decode Priority
+		int priority = decodePriority(ByteUtility.byteSubarray(encodedBytes, index, ConstUtility.SYNSTREAM_PRIORITY_LENGTH));
+		index += ConstUtility.SYNSTREAM_PRIORITY_LENGTH;
+		index += ConstUtility.SYNSTREAM_UNUSED_LENGTH;
+		//Decode number of pairs
+		int numOfPairs = ByteUtility.littleEndianToUINT16(ByteUtility.
+				byteSubarray(encodedBytes, index,ConstUtility.NUM_OF_PAIRS_LENGTH));
+		index += ConstUtility.NUM_OF_PAIRS_LENGTH;
 		// Decode header
 		HeaderBlock headerBlock = HeaderBlock
 				.decode(ByteUtility.byteSubarray(encodedBytes, index, encodedBytes.length - index));
 
-		SynStream frame = new SynStream(streamId,headerBlock);
+		SynStream frame = new SynStream(streamId, headerBlock);
 		return frame;
-
 	}
 
 	/**
 	 * Sets the value of streamID in the frame
 	 * 
 	 * @param streamID
+	 * @throws SpeedyException 
 	 */
-	public void setStreamID(int streamID) {
+	public void setStreamID(int streamID) throws SpeedyException {
+		if(streamID <= 0){
+			throw new SpeedyException("StreamID should be bigger than 0.");
+		}
 		this.streamID = streamID;
 	}
 
@@ -184,6 +213,13 @@ public class SynStream extends ControlFrame {
 		this.priority = priority;
 	}
 
+	public void setPriority(int priority) {
+		if (priority < 0 || priority > 7) {
+			System.err.println("setPriority error: the priority shoud be between 0 and 7.");
+		}
+		this.priority = (short) priority;
+	}
+
 	/**
 	 * Gets the priority of the Frame
 	 * 
@@ -225,56 +261,22 @@ public class SynStream extends ControlFrame {
 
 	/**
 	 * Sets the headerBlock
+	 * @throws SpeedyException 
 	 */
-	private void setHeaderBlock(HeaderBlock headerBlock) {
+	private void setHeaderBlock(HeaderBlock headerBlock) throws SpeedyException {
+		
 		this.headerBlock = headerBlock;
 	}
 
 	/**
-	 * Gets the byte array of CFlag,Version and Type
+	 * Gets the headerBlock
 	 */
-	public byte[] getBytesCVT(boolean CFlag, short version, short type) {
-		byte[] cvt = new byte[4];
-
-		cvt[0] = (byte) (version & 0b11111111);
-		if (CFlag) {// For control frame
-			cvt[0] = (byte) (cvt[0] | 0b10000000);
-		}
-		cvt[1] = (byte) (version >> 8 & 0b11111111);
-		cvt[2] = (byte) (type & 0b1111111);
-		cvt[3] = (byte) (type >> 8 & 0b1111111);
-		return cvt;
+	public HeaderBlock getHeaderBlock() {
+		return this.headerBlock;
 	}
 
-	/**
-	 * Turn flags and length into byte array
-	 * 
-	 * @param flags
-	 * @param length
-	 * @return
-	 */
-	private byte[] getBytesFL(byte flags, int length) {
-		byte[] fl = new byte[4];
-		fl[0] = flags;
-		fl[1] = (byte) (length >> 8 & 0b11111111);
-		fl[2] = (byte) (length >> 16 & 0b11111111);
-		fl[3] = (byte) (length >> 24 & 0b11111111);
-		return fl;
-	}
 
-	/**
-	 * Gets the cFlag
-	 * 
-	 * @param cf
-	 * @return
-	 */
-	private static boolean decodeCFlag(byte cf) {
-		boolean cFlag = false;
-		if ((cf & 0b10000000) != 0b0000000) {
-			cFlag = true;
-		}
-		return cFlag;
-	}
+	
 
 	/**
 	 * Decodes the version
@@ -282,29 +284,14 @@ public class SynStream extends ControlFrame {
 	 * @param value
 	 * @return
 	 */
-	private static short decodeVersion(byte[] value) {
-		short version = 0;
-		version = (short) ByteUtility.littleEndianToUINT16(value);
-		version = (short) (version & 0b0111111);
-		return version;
+	private static short decodePriority(byte[] value) {
+
+		short priority = 0;
+		priority = (short) (value[0] >> 6 & 0b00000011);
+		return priority;
 	}
 
-	/**
-	 * Decodes the length
-	 * 
-	 * @param value
-	 * @return
-	 */
-	private static int decodeLength(byte[] value) {
-		if (value.length != 3) {
-			System.err.println("decodeLength error: the length should be 24 bits.");
-		}
-		int length = 0;
-		length += value[2] << 16;
-		length += value[1] << 8;
-		length += value[0];
-		return length;
-	}
+	
 
 	/**
 	 * Sets the value of number of Name/Value pairs
@@ -314,18 +301,37 @@ public class SynStream extends ControlFrame {
 	private void setNumOfPairs(short numOfPairs) {
 		this.numOfPairs = numOfPairs;
 	}
+
 	/**
 	 * Gets the bytes array of priority, unused and numOfPairs
+	 * 
 	 * @param priority
 	 * @param numOfPairs
 	 * @return
 	 */
-	private byte[] getBytesPN(short priority, short numOfPairs){
+	private byte[] getBytesPN(short priority, short numOfPairs) {
 		byte[] pn = new byte[4];
-		pn[0] =(byte)( priority & 0b00000111 << 1);
-		byte[] nop = ByteUtility.uint16ToLittleEndian(numOfPairs);
+		pn[0] = (byte) ((priority & 0b00000011) << 6);
+		byte[] nop = ByteUtility.uint16ToLittleEndian(numOfPairs);// Number of
+																	// pairs
 		pn[2] = nop[0];
 		pn[3] = nop[1];
 		return pn;
+	}
+
+	/**
+	 * Sets the default length of data in the syn Stream frame without any block
+	 */
+	private void setDefaultDataLength() {
+		this.length = ConstUtility.SYNSTREAM_DEFAULT_DATA_LENGTH;
+	}
+
+	/**
+	 * Sets the length of data in Syn Stream frame
+	 * 
+	 * @param length
+	 */
+	private void setLengthData(int length) {
+		this.length = length;
 	}
 }
