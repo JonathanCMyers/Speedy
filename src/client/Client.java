@@ -12,10 +12,12 @@ import java.io.*;
 import java.net.Socket;
 import java.net.UnknownHostException;
 
-import javax.net.ssl.SSLSession;
-import javax.net.ssl.SSLSocket;
+import serialization.*;
+import serialization.exception.SpeedyException;
+import utility.SocketFactory;
 
-import java.util.Scanner;
+import java.util.ArrayList;
+import java.util.Random;
 
 /**
  * Client to connect and retrieve data from a server
@@ -49,10 +51,36 @@ public class Client {
 	 */
 	private static OutputStream out;
 	
+	/**
+	 * Signifies whether the Client still wants to be in communication with the Server
+	 */
+	private static boolean doneCommunicating;
+	
+	/**
+	 * Contains all frames that have been received by the client, but have not been processed yet
+	 */
+	private static ArrayList<Frame> frameQueue;
+	
+	/**
+	 * Thread to receive all incoming frames
+	 */
+	private static FrameReceiver frameReceiver;
+	
+	
+	/**
+	 * 
+	 * @param args
+	 */
 	public static void main(String[] args) {
 		
 		handleArgs(args); // Store the port number and server from the arguments given
 		createSocket(); // Create socket that is connected to server on specified port
+		initializeFrameReceiver(); // Setup a thread to catch all incoming packets
+		sendSynStream(); // Send a SynStream to the server
+		while(!doneCommunicating) {
+			
+		}
+		
 		//Scanner reader = new Scanner(System.in); // Create the scanner to read in the input from the user
 		
 		// Request page
@@ -81,6 +109,8 @@ public class Client {
 			System.exit(1);
 		}
 		serverName = args[0];
+		doneCommunicating = false;
+		frameQueue = new ArrayList<Frame>();
 	}
 	
 	/**
@@ -88,7 +118,7 @@ public class Client {
 	 */
 	public static void createSocket() {
 		try {
-			socket = new Socket(serverName, serverPort);
+			socket = SocketFactory.createClientSocket(serverName, serverPort);
 			in = socket.getInputStream();
 			out = socket.getOutputStream();
 		} catch(UnknownHostException e) {
@@ -96,6 +126,36 @@ public class Client {
 			System.exit(1);
 		} catch(IOException e) {
 			System.err.println("Unable to communicate: IOException from socket initialization");
+			System.exit(1);
+		} catch (SpeedyException e) {
+			System.err.println(e.getMessage());
+			System.exit(1);
+		}
+	}
+	
+	/**
+	 * Initializes the frame receiver, which stores each frame it receives
+	 */
+	public static void initializeFrameReceiver() {
+		frameReceiver = new FrameReceiver(socket, in, out, frameQueue);
+		frameReceiver.run();
+	}
+	
+	/**
+	 * Creates a SynStream with a random odd streamID, and sends it to the server
+	 */
+	public static void sendSynStream() {
+		Random r = new Random(2584);
+		byte[] encodedBytes = null;
+		try {
+			SynStream s = new SynStream(2 * r.nextInt(200) + 1); // Must be odd
+			encodedBytes = s.encode();
+			out.write(encodedBytes);
+		} catch(SpeedyException e) {
+			System.err.println("Error initializing SynStream: " + e.getMessage());
+			System.exit(1);
+		} catch(IOException e) {
+			System.err.println("Error sending SynStream to server: " + e.getMessage());
 			System.exit(1);
 		}
 	}

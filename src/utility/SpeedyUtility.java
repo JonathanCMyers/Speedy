@@ -17,4 +17,6 @@ public class SpeedyUtility {
 	
 	public static final boolean USING_SSL = false;
 	
+	public static final int MAX_TCP_PAYLOAD_SIZE = 65535;
+	
 }
