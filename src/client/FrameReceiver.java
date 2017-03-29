@@ -57,15 +57,19 @@ public class FrameReceiver implements Runnable {
 			try {
 				byte[] incomingBytes = new byte[SpeedyUtility.MAX_TCP_PAYLOAD_SIZE];
 				int bytesRead = in.read(incomingBytes);
+				System.out.println("Length: " + bytesRead);
 				f = Frame.decode(Arrays.copyOfRange(incomingBytes, 0, bytesRead));
 			} catch(SpeedyException e) {
 				System.err.println("Error decoding frame: " + e.getMessage());
 			} catch (IOException e) {
 				System.err.println("Error reading frame from server: " + e.getMessage());
+			} catch(ArrayIndexOutOfBoundsException e) {
+				System.err.println(e.getMessage());
+				System.exit(1);
 			}
 			if(f != null) {
 				frameQueue.add((SynStream)f);
-				System.out.println("Frame added!");
+				System.out.println("Frame added: " + ((SynStream)f).toString());
 			}
 		}
 		

@@ -128,16 +128,16 @@ public class SynStream extends ControlFrame {
 		return encodedBytes;
 	}
 
-	public static Frame decode(byte[] encodedBytes) throws SpeedyException {
-		if(encodedBytes == null || encodedBytes.length < ConstUtility.SYNSTREAM_HEADER_LENGTH){
+	public static Frame decode(MessageInput min) throws SpeedyException {
+		if(min == null) {
 			throw new SpeedyException("The byte array is illegal.");
 		}
 		
 		// Decode CFlag
 		int index = 0;
-		boolean cFlag = decodeCFlag(encodedBytes[0]);
+		boolean cFlag = decodeCFlag(min.getFlag());
 		// Decode version
-		short version = decodeVersion(ByteUtility.byteSubarray(encodedBytes, index, ConstUtility.VERSION_BYTE_LENGTH));
+		short version = decodeVersion(min.getNumberBytes(ConstUtility.VERSION_BYTE_LENGTH));
 		index += ConstUtility.VERSION_BYTE_LENGTH;
 		// Decode type
 		short type = (short) ByteUtility
@@ -267,8 +267,7 @@ public class SynStream extends ControlFrame {
 
 	@Override
 	public String toString() {
-		// TODO
-		throw new UnsupportedOperationException("SynStream.toString()");
+		return "[SynStream] [id: " + streamID + "] [HeaderBlockSize: " + headerBlock.getLength() + "]";
 	}
 
 	@Override

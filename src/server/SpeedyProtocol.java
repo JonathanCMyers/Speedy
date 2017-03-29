@@ -12,6 +12,7 @@ import java.io.EOFException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.io.BufferedOutputStream;
 import java.net.Socket;
 import java.util.logging.Logger;
 
@@ -50,6 +51,11 @@ public class SpeedyProtocol implements Runnable {
 	private OutputStream out;
 	
 	/**
+	 * Buffered output stream to make sure only one frame is being sent at a time
+	 */
+	private BufferedOutputStream bufferedOut;
+	
+	/**
 	 * SpeedyProtocol constructor to hold the variables needed at each Client connection
 	 * @param clientSock Socket that contains the connection to the client
 	 * @param logger Logger for the Server to write to when it has something to say
@@ -67,27 +73,28 @@ public class SpeedyProtocol implements Runnable {
 			// Get the InputStream and OutputStream from the Client
 			in = getClientInputStream();
 			out = getClientOutputStream();
+			bufferedOut = new BufferedOutputStream(out);
 			
 			// Log the Client connection
 			logger.info("Handling client " + clientSock.getInetAddress() + "-" + clientSock.getPort() + 
 					" with thread id " + Thread.currentThread().getId() + "\n");
 
-			int count = 1;
-			while(true) {
-				
-				if(count%5000 == 0) {
-					try {
-						SynStream s = new SynStream(2);
-						byte[] encodedBytes = s.encode();
-						out.write(encodedBytes);
-					} catch (SpeedyException e) {
-						System.err.println("Could not initialize SynStream!" + e.getMessage());
-					} catch (IOException e) {
-						System.err.println("Could not send SynStream to Client!" + e.getMessage());
-					} 
-				}
-				
-				count++;
+			for(int i = 0; i < 3; i++) {
+				try {
+					SynStream s = new SynStream(2);
+					byte[] encodedBytes = s.encode();
+					System.out.println("Length of encoded bytes [server-side]: " + encodedBytes.length);
+					bufferedOut.write(encodedBytes);
+					bufferedOut.flush();
+				} catch (SpeedyException e) {
+					System.err.println("Could not initialize SynStream!" + e.getMessage());
+				} catch (IOException e) {
+					System.err.println("Could not send SynStream to Client!" + e.getMessage());
+				} 
+			}
+
+
+
 				//Frame fm = receiveFrame();
 				
 				/*
@@ -125,7 +132,7 @@ public class SpeedyProtocol implements Runnable {
 					closeClient(clientSock);
 				}
 				*/
-			} 
+
 		} catch(ServerBreakException e) {
 			System.exit(1);
 		}
@@ -188,7 +195,12 @@ public class SpeedyProtocol implements Runnable {
 		try {
 			fm = Frame.decode(readBytes);
 		} catch(SpeedyException e) {
-			sendErrorMessage(e.getMessage());
+			try {
+				sendErrorMessage(e.getMessage());
+			} catch (SpeedyException e1) {
+				// TODO Auto-generated catch block
+				e1.printStackTrace();
+			}
 			throw new ServerBreakException("Error decoding client's packet: " + e.getMessage(), e);
 		}
 		
@@ -246,9 +258,15 @@ public class SpeedyProtocol implements Runnable {
 	 * @throws ServerContinueException when sending the Goaway was successful
 	 * @throws ServerBreakException if there was an error sending the Goaway
 	 */
-	public void sendErrorMessage(String message) throws ServerContinueException, ServerBreakException {
-		
-		Frame fm = new GoAway();
+	public void sendErrorMessage(String message) throws ServerContinueException, ServerBreakException, SpeedyException {
+		Frame fm = null;
+		/*
+		try {
+			fm = new GoAway();
+		} catch(SpeedyException e) {
+			throw new UnsupportedOperationException("Bad!");
+		}
+		*/
 		byte[] encodedGoaway = fm.encode();
 		//out.write(encodedGoaway);
 		logger.info("[Send message] Sent to " + clientSock.getInetAddress() + "-" + clientSock.getPort() + " " + fm.toString() + "\n");
