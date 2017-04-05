@@ -26,7 +26,7 @@ public class GoAway extends ControlFrame {
 	 * Constructor for the goaway frame
 	 * 
 	 * @param lastStreamID
-	 * @throws SpeedyException 
+	 * @throws SpeedyException
 	 */
 	public GoAway(int lastStreamID) throws SpeedyException {
 		setType(ConstUtility.GOAWAY);
@@ -58,21 +58,26 @@ public class GoAway extends ControlFrame {
 		// Decode version
 		short version = decodeVersion(ByteUtility.byteSubarray(encodedBytes, index, ConstUtility.VERSION_BYTE_LENGTH));
 		index += ConstUtility.VERSION_BYTE_LENGTH;
-		
+
 		// Decode type
 		short type = (short) ByteUtility
 				.littleEndianToUINT16(ByteUtility.byteSubarray(encodedBytes, index, ConstUtility.TYPE_BYTE_LENGTH));
 		index += ConstUtility.TYPE_BYTE_LENGTH;
-		
-		// Decode flags 
+
+		// Decode flags
 		byte flags = encodedBytes[index];
 		index += ConstUtility.FLAGS_BYTE_LENGTH;
 		// Decode length
 		int length = decodeLength(ByteUtility.byteSubarray(encodedBytes, index, ConstUtility.LENGTH_BYTE_LENGTH));
 		index += ConstUtility.LENGTH_BYTE_LENGTH;
-		//
-		return new GoAway();
-		
+		// Decode last stream ID
+		int lastStreamID = ByteUtility.littleEndianToUINT32(
+				ByteUtility.byteSubarray(encodedBytes, index, ConstUtility.LAST_STREAMID_BYTE_LENGTH));
+		Frame goaway = new GoAway(lastStreamID);
+		goaway.setLength(length);
+		goaway.setFlags(flags);
+		return goaway;
+
 	}
 
 	@Override
@@ -91,7 +96,7 @@ public class GoAway extends ControlFrame {
 	 * Sets the value of the last stream id
 	 * 
 	 * @param lastStreamID
-	 * @throws SpeedyException 
+	 * @throws SpeedyException
 	 */
 	private void setLastStreamID(int lastStreamID) throws SpeedyException {
 		if (lastStreamID <= 0) {
@@ -109,6 +114,5 @@ public class GoAway extends ControlFrame {
 	private int getLastStreamID() {
 		return this.lastStreamID;
 	}
-	
-	
+
 }

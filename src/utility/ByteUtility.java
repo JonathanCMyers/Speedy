@@ -9,6 +9,11 @@ package utility;
 
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
+import java.util.zip.DataFormatException;
+import java.util.zip.Deflater;
+import java.util.zip.Inflater;
+
+import serialization.exception.SpeedyException;
 
 public class ByteUtility {
 
@@ -183,4 +188,50 @@ public class ByteUtility {
 		}
 		return newBytes;
 	}
+	
+	/**
+	 * Compress the data using SPDY_dictionary_txt
+	 * @param data
+	 * @return
+	 * @throws SpeedyException
+	 */
+	public static byte[] compress(byte[] data) throws SpeedyException{
+		if(data.length > ConstUtility.MAX_COMPRESS_LENGTH){
+			throw new SpeedyException("Compress data is too long.");
+		}
+		Deflater compress = new Deflater();
+		compress.setInput(data);
+		compress.setDictionary(ConstUtility.SPDY_dictionary_txt);
+		compress.finish();
+		byte[] compressedData = new byte[ConstUtility.MAX_COMPRESS_LENGTH];
+
+		int compressLength = compress.deflate(compressedData, 0, compressedData.length);
+		compress.finish();
+		return ByteUtility.byteSubarray(compressedData, 0, compressLength);
+	}
+	
+	/**
+	 * Decompress the data by using SPDY_dictionary_txt
+	 * @param data
+	 * @return
+	 */
+	public static byte[] decompress(byte[] data){
+		Inflater decompress = new Inflater();
+		decompress.setInput(data);
+		decompress.finished();
+		byte[] decompressedData = new byte[ConstUtility.MAX_COMPRESS_LENGTH];
+
+		int decompressLength = 0;
+		try {
+			decompress.inflate(decompressedData);
+			decompress.setDictionary(ConstUtility.SPDY_dictionary_txt);
+			decompressLength = decompress.inflate(decompressedData);
+		} catch (DataFormatException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	
+		return ByteUtility.byteSubarray(decompressedData, 0, decompressLength);
+	}
+	
 }

@@ -43,8 +43,6 @@ public class HeaderBlock {
 		Block block = new Block(name, value);
 		numOfPairs++;
 		blocksList.add(block);
-		length += ConstUtility.BLOCK_NAME_LENGTH_LENGTH + ConstUtility.BLOCK_VALUE_LENGTH_LENGTH +
-				block.getName().length() + block.getValue().length();
 	}
 	
 	/**
@@ -54,8 +52,6 @@ public class HeaderBlock {
 	public void addBlock(Block block) {
 		numOfPairs++;
 		blocksList.add(block);
-		length += ConstUtility.BLOCK_NAME_LENGTH_LENGTH + ConstUtility.BLOCK_VALUE_LENGTH_LENGTH +
-				block.getName().length() + block.getValue().length();
 	}
 
 	/**
@@ -85,7 +81,9 @@ public class HeaderBlock {
 			ByteUtility.copyBytes(encodedHeaderBlock, position, eb);
 			position += eb.length;
 		}
-		return encodedHeaderBlock;
+		//Compress the data
+		
+		return ByteUtility.compress(encodedHeaderBlock);
 	}
 
 	/**
@@ -94,7 +92,8 @@ public class HeaderBlock {
 	 * @return
 	 * @throws SpeedyException 
 	 */
-	public static HeaderBlock decode(byte[] encodedHeaderBlock ) throws SpeedyException{
+	public static HeaderBlock decode(byte[] headerBlockData ) throws SpeedyException{
+		byte[] encodedHeaderBlock = ByteUtility.decompress(headerBlockData);
 		HeaderBlock headerBlock = new HeaderBlock();
 		int index = 0;
 		//Decode numOfPairs
@@ -110,6 +109,7 @@ public class HeaderBlock {
 			numOfPairs++;
 			index += lengthOfBlock;
 		}
+		headerBlock.setnumOfPairs(numOfPairs);
 		return headerBlock;
 	}
 	/**
@@ -131,8 +131,17 @@ public class HeaderBlock {
 	/**
 	 * Gets the length of Header block
 	 * @return
+	 * @throws SpeedyException 
 	 */
-	public int getLength(){
+	public int getLength() {
+		int length = 0;
+		try {
+			length = this.encode().length;
+		} catch (SpeedyException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
 		return length;
 	}
 	
@@ -167,6 +176,13 @@ public class HeaderBlock {
 			}
 		}
 		return true;
+	}
+	/**
+	 * Sets the value of numOfPairs
+	 * @param num
+	 */
+	public void setnumOfPairs(int num){
+		numOfPairs = num;
 	}
 
 	

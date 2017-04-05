@@ -97,6 +97,7 @@ public class FinStream extends ControlFrame{
 		index += ConstUtility.FINSTREAM_STATUS_CODE_LENGTH;
 		
 		FinStream frame = new FinStream(streamId, statusCode);
+		frame.setLength(length);
 		return frame;
 	}
 	
@@ -128,7 +129,6 @@ public class FinStream extends ControlFrame{
 	public int getStatusCode(){
 		return statusCode;
 	}
-	
 	
 	/**
 	 * Gets the length of data in fin stream frame

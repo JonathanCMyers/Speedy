@@ -47,7 +47,7 @@ public abstract class Frame {
 			e.printStackTrace();
 		}
 		int dataLength = decodeLength(ByteUtility.byteSubarray(header, header.length - ConstUtility.LENGTH_BYTE_LENGTH, ConstUtility.LENGTH_BYTE_LENGTH));
-		System.out.println("dataLength:" + dataLength);
+		
 		boolean cFlag = decodeCFlag(header[0]);
 		Frame frame = null;
 		
@@ -187,9 +187,6 @@ public abstract class Frame {
 			System.err.println("decodeLength error: the length should be 24 bits.");
 		}
 		
-		for (int i = 0;i < 3;i++) {
-			    System.out.println(Integer.toBinaryString(value[i] & 255 | 256).substring(1));
-			}
 		int length = 0;
 		length += value[0] << 16;
 		length += value[1] << 8;
