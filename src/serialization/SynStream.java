@@ -161,11 +161,17 @@ public class SynStream extends ControlFrame {
 		int numOfPairs = ByteUtility.littleEndianToUINT16(ByteUtility.
 				byteSubarray(encodedBytes, index,ConstUtility.NUM_OF_PAIRS_LENGTH));
 		index += ConstUtility.NUM_OF_PAIRS_LENGTH;
+		
 		// Decode header
-		HeaderBlock headerBlock = HeaderBlock
-				.decode(ByteUtility.byteSubarray(encodedBytes, index, encodedBytes.length - index));
+		SynStream frame = null;
+		byte[] headerBlockBytes = ByteUtility.byteSubarray(encodedBytes, index, encodedBytes.length - index);
+		if(headerBlockBytes.length > 0) {
+			HeaderBlock headerBlock = HeaderBlock.decode(headerBlockBytes);
+			frame = new SynStream(streamId, headerBlock);
+		} else {
+			frame = new SynStream(streamId);
+		}
 
-		SynStream frame = new SynStream(streamId, headerBlock);
 		frame.setPriority(priority);
 		frame.setLength(length);
 		frame.setFlags(flags);

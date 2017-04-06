@@ -60,6 +60,14 @@ public class ConstUtility {
 	public static final int HELLO_ROUND_TRIP_TIME  = 3;//
 	public static final int HELLO_MAX_CONCURRENT_STREAMS  = 4;//
 	
+	public static final boolean USING_SSL = false; // States whether we are using SSL or not in this connection
+	public static final int MAX_TCP_PAYLOAD_SIZE = 65507; // Maximum size that a single TCP packet can hold
+	
+	public static final String HTTP_VERSION = "HTTP1.1";
+	public static final String REQUEST_SOURCE = "From: someuser@baylor.edu";
+	public static final String USER_AGENT = "User-Agent: HTTPTool/1.0";
+	public static final String HTTP_CORRECT_VALIDATION = "200 OK";
+	
 	public static final int MAX_COMPRESS_LENGTH  = 10000;//
 	public static final byte[] SPDY_dictionary_txt = {
 			0x00, 0x00, 0x00, 0x07, 0x6f, 0x70, 0x74, 0x69,   // - - - - o p t i

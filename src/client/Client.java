@@ -14,7 +14,8 @@ import java.net.UnknownHostException;
 
 import serialization.*;
 import serialization.exception.SpeedyException;
-import utility.SocketFactory;
+import utility.ClientFactory;
+import utility.ConstUtility;
 
 import java.util.ArrayList;
 import java.util.Random;
@@ -42,19 +43,24 @@ public class Client {
 	private static Socket socket;
 	
 	/**
+	 * ID used to communicate with the server
+	 */
+	private static int streamID;
+	
+	/**
 	 * InputStream from the socket to receive input from the server
 	 */
 	private static InputStream in;
 	
 	/**
+	 * MessageInput from the socket to receive input from the server
+	 */
+	private static MessageInput min;
+	
+	/**
 	 * OutputStream from the socket to write output to the server
 	 */
 	private static OutputStream out;
-	
-	/**
-	 * Signifies whether the Client still wants to be in communication with the Server
-	 */
-	private static boolean doneCommunicating;
 	
 	/**
 	 * Contains all frames that have been received by the client, but have not been processed yet
@@ -64,30 +70,19 @@ public class Client {
 	/**
 	 * Thread to receive all incoming frames
 	 */
-	private static FrameReceiver frameReceiver;
+	private static Thread frameReceiver;
 	
 	
 	/**
-	 * 
+	 * Makes a simple HTTP GET Request to the server
 	 * @param args
 	 */
 	public static void main(String[] args) {
-		
 		handleArgs(args); // Store the port number and server from the arguments given
 		createSocket(); // Create socket that is connected to server on specified port
-		initializeFrameReceiver(); // Setup a thread to catch all incoming packets
 		sendSynStream(); // Send a SynStream to the server
-		while(!doneCommunicating) {
-			
-		}
-		
-		//Scanner reader = new Scanner(System.in); // Create the scanner to read in the input from the user
-		
-		// Request page
-		// Receive multiplexed elements of page
-		// Reconstruct page
-		
-		
+		requestPage("/"); // Send an HTTP GET request
+		receiveHTTPReply(); // Receive HTTP reply
 	}
 	
 	/**
@@ -109,7 +104,6 @@ public class Client {
 			System.exit(1);
 		}
 		serverName = args[0];
-		doneCommunicating = false;
 		frameQueue = new ArrayList<Frame>();
 	}
 	
@@ -118,16 +112,17 @@ public class Client {
 	 */
 	public static void createSocket() {
 		try {
-			socket = SocketFactory.createClientSocket(serverName, serverPort);
+			socket = ClientFactory.getClientSocket(serverName, serverPort);
 			in = socket.getInputStream();
 			out = socket.getOutputStream();
+			min = new MessageInput(in);
 		} catch(UnknownHostException e) {
 			System.err.println("Unable to communicate: Unknown Host.");
 			System.exit(1);
 		} catch(IOException e) {
 			System.err.println("Unable to communicate: IOException from socket initialization");
 			System.exit(1);
-		} catch (SpeedyException e) {
+		} catch (Exception e) {
 			System.err.println(e.getMessage());
 			System.exit(1);
 		}
@@ -138,7 +133,7 @@ public class Client {
 	 */
 	public static void initializeFrameReceiver() {
 		frameReceiver = new FrameReceiver(socket, in, out, frameQueue);
-		frameReceiver.run();
+		frameReceiver.start();
 	}
 	
 	/**
@@ -146,9 +141,10 @@ public class Client {
 	 */
 	public static void sendSynStream() {
 		Random r = new Random(2584);
+		streamID = 2 * r.nextInt(200) + 1; // Must be odd
 		byte[] encodedBytes = null;
 		try {
-			SynStream s = new SynStream(2 * r.nextInt(200) + 1); // Must be odd
+			SynStream s = new SynStream(streamID);
 			encodedBytes = s.encode();
 			out.write(encodedBytes);
 		} catch(SpeedyException e) {
@@ -158,5 +154,37 @@ public class Client {
 			System.err.println("Error sending SynStream to server: " + e.getMessage());
 			System.exit(1);
 		}
+	}
+	
+	public static void requestPage(String fileRequest) {
+		String pageRequest = "GET " + fileRequest + " " + ConstUtility.HTTP_VERSION + "\n";
+		pageRequest += ConstUtility.REQUEST_SOURCE + "\n";
+		pageRequest += ConstUtility.USER_AGENT + "\n";
+		
+		
+		byte[] dataBytes = pageRequest.getBytes();
+		try {
+			Frame df = new DataFrame(streamID, dataBytes);
+			byte[] encodedBytes = df.encode();
+			System.out.println("Writing " + encodedBytes.length + " bytes.");
+			out.write(encodedBytes);
+		} catch (SpeedyException e) {
+			System.err.println("Error creating DataFrame: " + e.getMessage());
+			System.exit(1);
+		} catch (IOException e) {
+			System.err.println("Error sending DataFrame to server: " + e.getMessage());
+			System.exit(1);
+		}
+	}
+	
+	public static void receiveHTTPReply() {
+		Frame f = null;
+		try {
+			f = Frame.decodeFrame(min);
+		} catch(SpeedyException e) {
+			System.err.println("Error decoding message: " + e.getMessage());
+			System.exit(1);
+		}
+		System.out.println(f);
 	}
 }

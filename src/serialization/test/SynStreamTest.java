@@ -117,5 +117,13 @@ public class SynStreamTest {
 		assertNotEquals(s1, s2);
 	}
 	
+	@Test
+	public void testEncodeDecodeReflexiveNoHeaderBlock() throws SpeedyException {
+		SynStream s = new SynStream(5);
+		byte[] encodedBytes = s.encode();
+		MessageInput min = new MessageInput(new ByteArrayInputStream(encodedBytes));
+		assertEquals(s, (SynStream)Frame.decodeFrame(min));
+	}
+	
 	
 }

@@ -8,19 +8,16 @@
 
 package client;
 
-import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.Socket;
 import java.util.ArrayList;
-import java.util.Arrays;
 
 import serialization.Frame;
-import serialization.SynStream;
+import serialization.MessageInput;
 import serialization.exception.SpeedyException;
-import utility.SpeedyUtility;
 
-public class FrameReceiver implements Runnable {
+public class FrameReceiver extends Thread {
 	
 	/**
 	 * Socket that manages the connection from the client to the server
@@ -31,6 +28,11 @@ public class FrameReceiver implements Runnable {
 	 * InputStream from the socket to receive input from the server
 	 */
 	private InputStream in;
+	
+	/**
+	 * MessageInput to parse input from the socket
+	 */
+	private MessageInput min;
 	
 	/**
 	 * OutputStream from the socket to write output to the server
@@ -45,31 +47,26 @@ public class FrameReceiver implements Runnable {
 	public FrameReceiver(Socket socket, InputStream in, OutputStream out, ArrayList<Frame> frameQueue) {
 		this.socket = socket;
 		this.in = in;
+		min = new MessageInput(in);
 		this.out = out;
 		this.frameQueue = frameQueue;
 	}
-
 	
 	@Override
 	public void run() {
 		while(true) {
 			Frame f = null;
 			try {
-				byte[] incomingBytes = new byte[SpeedyUtility.MAX_TCP_PAYLOAD_SIZE];
-				int bytesRead = in.read(incomingBytes);
-				System.out.println("Length: " + bytesRead);
-				f = Frame.decode(Arrays.copyOfRange(incomingBytes, 0, bytesRead));
+				f = Frame.decodeFrame(min);
 			} catch(SpeedyException e) {
 				System.err.println("Error decoding frame: " + e.getMessage());
-			} catch (IOException e) {
-				System.err.println("Error reading frame from server: " + e.getMessage());
-			} catch(ArrayIndexOutOfBoundsException e) {
-				System.err.println(e.getMessage());
 				System.exit(1);
+			} catch(IllegalArgumentException e) {
+				System.err.println(f);
 			}
 			if(f != null) {
-				frameQueue.add((SynStream)f);
-				System.out.println("Frame added: " + ((SynStream)f).toString());
+				frameQueue.add(f);
+				System.out.println("Frame added: " + f);
 			}
 		}
 		

@@ -22,6 +22,7 @@ import serialization.HeaderBlock;
 import serialization.MessageInput;
 import serialization.DataFrame;
 import serialization.exception.SpeedyException;
+import utility.ConstUtility;
 
 public class DataFrameTest {
 	@Test
@@ -35,6 +36,22 @@ public class DataFrameTest {
 		DataFrame df = (DataFrame) d2;
 		
 		assertEquals(d1, (DataFrame) d2);
+	}
+	
+	@Test
+	public void testHTTPData() throws SpeedyException {
+		String pageRequest = "GET / " + ConstUtility.HTTP_VERSION + "\n";
+		pageRequest += ConstUtility.REQUEST_SOURCE + "\n";
+		pageRequest += ConstUtility.USER_AGENT + "\n";
+		
+		
+		byte[] dataBytes = pageRequest.getBytes();
+
+		Frame df = new DataFrame(5, dataBytes);
+		byte[] encodedBytes = df.encode();
+		
+		assertEquals(df, (DataFrame)Frame.decodeFrame(new MessageInput(new ByteArrayInputStream(encodedBytes))));
+
 	}
 
 	@Test(expected = SpeedyException.class)

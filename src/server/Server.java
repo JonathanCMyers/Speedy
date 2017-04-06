@@ -16,7 +16,7 @@ import java.util.concurrent.Executors;
 import java.util.logging.FileHandler;
 import java.util.logging.Logger;
 
-import utility.SocketFactory;
+import utility.ServerFactory;
 
 /**
  * Server class to handle the separate threads when a Client tries to connect
@@ -51,7 +51,7 @@ public class Server {
 		testArgs(args);
 		
 		// Create the ServerSocket
-		try(ServerSocket servSock = SocketFactory.createServerSocket(serverPort)) {
+		try(ServerSocket servSock = ServerFactory.getServerListeningSocket(serverPort, "src/keystore", "icecream")) {
 			// Set SO_REUSEADDR
 			servSock.setReuseAddress(true);
 			// Executor to handle threadCount number of Threads
@@ -62,8 +62,8 @@ public class Server {
 				// Try to accept a new client
 				Socket clientSock = null;
 				try {
-					clientSock = servSock.accept();	
-					clientSock.setSoTimeout(10000); // Set the Client socket timeout to 10 seconds
+					clientSock = ServerFactory.getServerConnectedSocket(servSock);
+					//clientSock.setSoTimeout(10000); // Set the Client socket timeout to 10 seconds
 				} catch (IOException e) {
 					logger.warning("Issue connecting to a client");
 					throw new IOException(e.getMessage());
@@ -87,7 +87,7 @@ public class Server {
 		// Create a Logger for logging whatever the Server needs to do
 		logger = Logger.getLogger("practical");
 		logger.addHandler(fileHandler);
-		logger.setUseParentHandlers(false);
+		logger.setUseParentHandlers(true);
 	}
 	
 	
@@ -105,6 +105,26 @@ public class Server {
 	
 }
 
+
+
+/*
+ * public class TestServer {
+	public static void main(final String[] args) throws Exception {
+		ServerSocket listSock = getServerListeningSocket(14999, "src/keystore", "icecream");
+
+		Socket cSock = getServerConnectedSocket(listSock);
+		if (cSock.getInputStream().read() == 1) {
+			System.out.println("Success");
+		} else {
+			System.err.println("Failure");
+		}
+		cSock.getOutputStream().write(2);
+		cSock.close();
+		listSock.close();
+	}
+}
+
+ */
 
 
 

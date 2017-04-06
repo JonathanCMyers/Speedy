@@ -188,9 +188,9 @@ public abstract class Frame {
 		}
 		
 		int length = 0;
-		length += value[0] << 16;
-		length += value[1] << 8;
-		length += value[2];
+		length += ((int) value[0] << 16) & 0xFF;
+		length += ((int) value[1] << 8) & 0xFF;
+		length += ((int) value[2]) & 0xFF;
 		
 		return length;
 	}

@@ -93,24 +93,27 @@ public class HeaderBlock {
 	 * @throws SpeedyException 
 	 */
 	public static HeaderBlock decode(byte[] headerBlockData ) throws SpeedyException{
-		byte[] encodedHeaderBlock = ByteUtility.decompress(headerBlockData);
-		HeaderBlock headerBlock = new HeaderBlock();
-		int index = 0;
-		//Decode numOfPairs
-		int numOfPairs = 0;
-		while(index < encodedHeaderBlock.length - 1){
-			short lengthOfName = ByteUtility.littleEndianToUINT16(
-					ByteUtility.byteSubarray(encodedHeaderBlock, index, ConstUtility.BLOCK_NAME_LENGTH_LENGTH));
-			short lengthOfValue = ByteUtility.littleEndianToUINT16(
-					ByteUtility.byteSubarray(encodedHeaderBlock, index + lengthOfName + ConstUtility.BLOCK_NAME_LENGTH_LENGTH, ConstUtility.BLOCK_VALUE_LENGTH_LENGTH));
-			int lengthOfBlock = ConstUtility.BLOCK_NAME_LENGTH_LENGTH + lengthOfName + ConstUtility.BLOCK_VALUE_LENGTH_LENGTH + lengthOfValue;
-			Block block = Block.decode(ByteUtility.byteSubarray(encodedHeaderBlock, index, lengthOfBlock));
-			headerBlock.addBlock(block);
-			numOfPairs++;
-			index += lengthOfBlock;
+		if(headerBlockData.length > 0) {
+			byte[] encodedHeaderBlock = ByteUtility.decompress(headerBlockData);
+			HeaderBlock headerBlock = new HeaderBlock();
+			int index = 0;
+			//Decode numOfPairs
+			int numOfPairs = 0;
+			while(index < encodedHeaderBlock.length - 1){
+				short lengthOfName = ByteUtility.littleEndianToUINT16(
+						ByteUtility.byteSubarray(encodedHeaderBlock, index, ConstUtility.BLOCK_NAME_LENGTH_LENGTH));
+				short lengthOfValue = ByteUtility.littleEndianToUINT16(
+						ByteUtility.byteSubarray(encodedHeaderBlock, index + lengthOfName + ConstUtility.BLOCK_NAME_LENGTH_LENGTH, ConstUtility.BLOCK_VALUE_LENGTH_LENGTH));
+				int lengthOfBlock = ConstUtility.BLOCK_NAME_LENGTH_LENGTH + lengthOfName + ConstUtility.BLOCK_VALUE_LENGTH_LENGTH + lengthOfValue;
+				Block block = Block.decode(ByteUtility.byteSubarray(encodedHeaderBlock, index, lengthOfBlock));
+				headerBlock.addBlock(block);
+				numOfPairs++;
+				index += lengthOfBlock;
+			}
+			headerBlock.setnumOfPairs(numOfPairs);
+			return headerBlock;
 		}
-		headerBlock.setnumOfPairs(numOfPairs);
-		return headerBlock;
+		return null;
 	}
 	/**
 	 * Gets the number of name/value pairs

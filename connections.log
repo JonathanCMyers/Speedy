@@ -1,15 +1,4 @@
-<?xml version="1.0" encoding="windows-1252" standalone="no"?>
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <!DOCTYPE log SYSTEM "logger.dtd">
 <log>
-<record>
-  <date>2017-03-29T12:57:22</date>
-  <millis>1490810242901</millis>
-  <sequence>0</sequence>
-  <logger>practical</logger>
-  <level>SEVERE</level>
-  <class>server.Server</class>
-  <method>testArgs</method>
-  <thread>1</thread>
-  <message>Parameter(s): &lt;Port&gt; &lt;ThreadCount&gt;</message>
-</record>
 </log>
