@@ -164,6 +164,7 @@ public class Client {
 		
 		byte[] dataBytes = pageRequest.getBytes();
 		try {
+			System.out.println(streamID);
 			Frame df = new DataFrame(streamID, dataBytes);
 			byte[] encodedBytes = df.encode();
 			System.out.println("Writing " + encodedBytes.length + " bytes.");
