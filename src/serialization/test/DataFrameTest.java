@@ -47,7 +47,7 @@ public class DataFrameTest {
 		
 		byte[] dataBytes = pageRequest.getBytes();
 
-		Frame df = new DataFrame(5, dataBytes);
+		Frame df = new DataFrame(221, dataBytes);
 		byte[] encodedBytes = df.encode();
 		
 		assertEquals(df, (DataFrame)Frame.decodeFrame(new MessageInput(new ByteArrayInputStream(encodedBytes))));
