@@ -75,7 +75,22 @@ public class ByteUtility {
 		return bytes;
 	}
 	
-	
+	/**
+	 * Converts a uint32 into littleEndian notation
+	 * @param value to be converted into little endian byte form
+	 * @return bytes the converted long value
+	 */
+	public static byte[] uint32ToEndian(int value) {
+		if(value < 0) {
+			throw new IllegalArgumentException("The given value should be a 32-bit, unsigned integer. Given: " + value);
+		}
+		byte[] bytes = new byte[4];
+		bytes[3] = (byte) (value & 0b11111111);
+		bytes[2] = (byte) (value >> 8  & 0b11111111);
+		bytes[1] = (byte) (value >> 16 & 0b11111111);
+		bytes[0] = (byte) (value >> 24 & 0b11111111);
+		return bytes;
+	}
 	
 	
 	/**
@@ -129,6 +144,24 @@ public class ByteUtility {
 		value += makeUnsigned(bytes[0]);
 		return value;
 	}
+	
+	/**
+	 * Converts a set of bytes into a 32-bit, unsigned integer, in reversed order
+	 * @param bytes to be converted
+	 * @return value the converted bytes
+	 */
+	public static int EndianToUINT32(byte[] bytes) {
+		if(bytes.length != 4) {
+			throw new IllegalArgumentException("Must be 4 bytes in length. Given: " + bytes.length + " bytes.");
+		}
+		int value = 0;
+		value += makeUnsigned(bytes[0]) << 24;
+		value += makeUnsigned(bytes[1]) << 16;
+		value += makeUnsigned(bytes[2]) << 8;
+		value += makeUnsigned(bytes[3]);
+		return value;
+	}
+	
 	
 	/**
 	 * Converts a set of bytes in little endian notation to a long
