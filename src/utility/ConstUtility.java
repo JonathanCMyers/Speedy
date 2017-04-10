@@ -32,17 +32,17 @@ public class ConstUtility {
 	public static final int FLAGS_BYTE_LENGTH = 1;
 	public static final int LENGTH_BYTE_LENGTH = 3;
 	public static final int STREAMID_BYTE_LENGTH = 4;
+	public static final int NUMBER_NAME_VALUE_PAIRS_LENGTH = 4;
 	public static final int LAST_STREAMID_BYTE_LENGTH = 4;
 	public static final int DATA_STREAM_HEADER_LENGTH = 8;
 	public static final int  BLOCK_NAME_LENGTH_LENGTH = 2;//The length of the Length of Name
 	public static final int  BLOCK_VALUE_LENGTH_LENGTH = 2;//The length of the Length of Value
-	public static final int  SYNSTREAM_HEADER_LENGTH = 16;//The length of the Length of Value
+	public static final int  SYNSTREAM_HEADER_LENGTH = 18;//The length of the Length of Value
 	public static final int  SYNREPLY_HEADER_LENGTH = 16;//The length of synreply header
-	public static final int  SYNSTREAM_DEFAULT_DATA_LENGTH = 8;//The length of the Length of Value
+	public static final int  SYNSTREAM_DEFAULT_DATA_LENGTH = 10;//The length of the Length of Value
 	public static final int  SYNSTREAM_PRIORITY_LENGTH = 1;//The length of the Length of priority, 2 bits
 	public static final int  SYNSTREAM_UNUSED_LENGTH = 1;//The length of the unused,14 bits
 	public static final int  REPLY_UNUSED_LENGTH = 2;//The length of the unused,16 bits
-	public static final int  NUM_OF_PAIRS_LENGTH = 2;//The length of numOfPairs
 	public static final int DEFAULT_DATA_LENGTH = 0;
 	
 	
@@ -69,7 +69,7 @@ public class ConstUtility {
 	public static final String HTTP_CORRECT_VALIDATION = "200 OK";
 	
 	public static final int MAX_COMPRESS_LENGTH  = 10000;//
-	public static final byte[] SPDY_dictionary_txt = {
+	public static final byte[] SPDY_DICTIONARY_TXT = {
 			0x00, 0x00, 0x00, 0x07, 0x6f, 0x70, 0x74, 0x69,   // - - - - o p t i
 			0x6f, 0x6e, 0x73, 0x00, 0x00, 0x00, 0x04, 0x68,   // o n s - - - - h
 			0x65, 0x61, 0x64, 0x00, 0x00, 0x00, 0x04, 0x70,   // e a d - - - - p

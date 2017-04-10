@@ -33,11 +33,6 @@ public class SynReply extends ControlFrame {
 	private byte slot;
 
 	/**
-	 * Holds the number of name/value pairs
-	 */
-	private short numOfPairs;
-
-	/**
 	 * Holds the HeaderBlock for the frame
 	 * 
 	 * @param streamID
@@ -50,7 +45,6 @@ public class SynReply extends ControlFrame {
 		setType(ConstUtility.SYN_REPLY_NUM);
 		setVersion(ConstUtility.VERSION);
 		setDefaultDataLength();
-		setNumOfPairs(ConstUtility.NUMBER_OF_PAIRS_DEFAULT);
 	}
 
 	public SynReply(int streamID, HeaderBlock headerBlock) throws SpeedyException {
@@ -58,8 +52,6 @@ public class SynReply extends ControlFrame {
 		setStreamID(streamID);
 		setType(ConstUtility.SYN_REPLY_NUM);
 		setVersion(ConstUtility.VERSION);
-		setNumOfPairs(headerBlock.getNumOfPairs());
-		System.out.println("SynLength:" + ConstUtility.SYNSTREAM_HEADER_LENGTH +","+ headerBlock.getLength());
 		setLengthData(ConstUtility.SYNSTREAM_DEFAULT_DATA_LENGTH + headerBlock.getLength());
 	}
 
@@ -89,9 +81,6 @@ public class SynReply extends ControlFrame {
 			ByteUtility.copyBytes(encodedBytes, index, streamid);
 			index += streamid.length;
 			index += ConstUtility.REPLY_UNUSED_LENGTH;
-			// Encode numOfPairs
-			ByteUtility.copyBytes(encodedBytes, index, ByteUtility.uint16ToLittleEndian(numOfPairs));
-			index += ConstUtility.NUM_OF_PAIRS_LENGTH;
 			// Encode HeaderBlock
 			ByteUtility.copyBytes(encodedBytes, index, encodedHeader);
 
@@ -120,7 +109,7 @@ public class SynReply extends ControlFrame {
 		// Decode flags
 		byte flags = encodedBytes[index];
 		index += ConstUtility.FLAGS_BYTE_LENGTH;
-		System.out.println("index"+index);
+		
 		// Decode length
 		int length = decodeLength(ByteUtility.byteSubarray(encodedBytes, index, ConstUtility.LENGTH_BYTE_LENGTH));
 		index += ConstUtility.LENGTH_BYTE_LENGTH;
@@ -129,10 +118,7 @@ public class SynReply extends ControlFrame {
 				ByteUtility.byteSubarray(encodedBytes, index, ConstUtility.STREAMID_BYTE_LENGTH));
 		index += ConstUtility.STREAMID_BYTE_LENGTH;
 		index += ConstUtility.REPLY_UNUSED_LENGTH;
-		// Decode number of pairs
-		int numOfPairs = ByteUtility
-				.littleEndianToUINT16(ByteUtility.byteSubarray(encodedBytes, index, ConstUtility.NUM_OF_PAIRS_LENGTH));
-		index += ConstUtility.NUM_OF_PAIRS_LENGTH;
+		
 		// Decode header
 		HeaderBlock headerBlock = HeaderBlock
 				.decode(ByteUtility.byteSubarray(encodedBytes, index, encodedBytes.length - index));
@@ -264,15 +250,6 @@ public class SynReply extends ControlFrame {
 		return cvt;
 	}
 
-
-	/**
-	 * Sets the value of number of Name/Value pairs
-	 * 
-	 * @param numOfPairs
-	 */
-	private void setNumOfPairs(short numOfPairs) {
-		this.numOfPairs = numOfPairs;
-	}
 
 	/**
 	 * Gets the bytes array of unused and numOfPairs
