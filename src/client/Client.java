@@ -140,8 +140,9 @@ public class Client {
 	 * Creates a SynStream with a random odd streamID, and sends it to the server
 	 */
 	public static void sendSynStream() {
-		Random r = new Random(2584);
-		streamID = 2 * r.nextInt(200) + 1; // Must be odd
+		//Random r = new Random(2584);
+		//streamID = 2 * r.nextInt(200) + 1; // Must be odd
+		streamID = 34;
 		byte[] encodedBytes = null;
 		try {
 			SynStream s = new SynStream(streamID);
@@ -168,6 +169,7 @@ public class Client {
 			Frame df = new DataFrame(streamID, dataBytes);
 			byte[] encodedBytes = df.encode();
 			System.out.println("Writing " + encodedBytes.length + " bytes.");
+			System.out.println(df);
 			out.write(encodedBytes);
 		} catch (SpeedyException e) {
 			System.err.println("Error creating DataFrame: " + e.getMessage());

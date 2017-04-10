@@ -11,8 +11,10 @@ package serialization.test;
 import static org.junit.Assert.*;
 
 import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.Scanner;
 
 import org.junit.Test;
 
@@ -20,6 +22,7 @@ import serialization.DataFrame;
 import serialization.Frame;
 import serialization.HeaderBlock;
 import serialization.MessageInput;
+import serialization.SynStream;
 import serialization.DataFrame;
 import serialization.exception.SpeedyException;
 import utility.ConstUtility;
@@ -39,19 +42,132 @@ public class DataFrameTest {
 	}
 	
 	@Test
-	public void testHTTPData() throws SpeedyException {
+	public void testHTTPDataEncodeEqualsDecode() throws SpeedyException {
+		
+		String fileRequest = "/";
+		int streamID = 221;
+		
+		
+		String pageRequest = "GET " + fileRequest + " " + ConstUtility.HTTP_VERSION + "\n";
+		pageRequest += ConstUtility.REQUEST_SOURCE + "\n";
+		pageRequest += ConstUtility.USER_AGENT + "\n";
+		
+		byte[] dataBytes = pageRequest.getBytes();
+
+		Frame df = new DataFrame(streamID, dataBytes);
+		byte[] encodedBytes = df.encode();
+		ByteArrayOutputStream out = new ByteArrayOutputStream();
+		try {
+			out.write(encodedBytes);
+		} catch (IOException e) {
+			throw new SpeedyException(e.getMessage(), e);
+		}
+		
+		MessageInput min = new MessageInput(new ByteArrayInputStream(out.toByteArray()));
+		Frame f = Frame.decodeFrame(min);
+		
+		assertEquals(df, f);
+	}
+	
+	@Test
+	public void testHTTPDataCanBeParsed() throws SpeedyException {
 		String pageRequest = "GET / " + ConstUtility.HTTP_VERSION + "\n";
 		pageRequest += ConstUtility.REQUEST_SOURCE + "\n";
 		pageRequest += ConstUtility.USER_AGENT + "\n";
 		
+		byte[] dataBytes = pageRequest.getBytes();
+
+		Frame df = new DataFrame(221, dataBytes);
+		byte[] encodedBytes = df.encode();
+		
+		Frame f = Frame.decodeFrame(new MessageInput(new ByteArrayInputStream(encodedBytes)));
+		dataBytes = ((DataFrame)f).getData();
+		Scanner scan = new Scanner(new ByteArrayInputStream(dataBytes));
+		String fileName = null;
+		
+		if(scan.hasNext()) {
+			if(scan.next().equalsIgnoreCase("GET")) {
+				if(scan.hasNext()) {
+					fileName = scan.next();
+				} else {
+					scan.close();
+					throw new SpeedyException("Invalid file name provided in GET request.");
+				}
+			} else {
+				scan.close();
+				throw new SpeedyException("Unexpected HTTP Request in DataFrame.");
+			}
+		} else {
+			scan.close();
+			throw new SpeedyException("Unexpected ending of parse in DataFrame.");
+		}
+		
+		scan.close();
+		assertEquals(fileName, "/");
+	}
+	
+	@Test
+	public void testHTTPDataCanBeParsedAfterSynStream() throws SpeedyException {
+		
+		SynStream s = new SynStream(221);
+		
+		ByteArrayOutputStream out = new ByteArrayOutputStream();
+		try {
+			out.write(s.encode());
+		} catch (IOException e) {
+			throw new SpeedyException(e.getMessage(), e);
+		}
+		
+		
+		
+		String pageRequest = "GET / " + ConstUtility.HTTP_VERSION + "\n";
+		pageRequest += ConstUtility.REQUEST_SOURCE + "\n";
+		pageRequest += ConstUtility.USER_AGENT + "\n";
 		
 		byte[] dataBytes = pageRequest.getBytes();
 
-		Frame df = new DataFrame(5, dataBytes);
+		Frame df = new DataFrame(221, dataBytes);
 		byte[] encodedBytes = df.encode();
+		try {
+			out.write(encodedBytes);
+		} catch (IOException e) {
+			throw new SpeedyException(e.getMessage(), e);
+		}
 		
-		assertEquals(df, (DataFrame)Frame.decodeFrame(new MessageInput(new ByteArrayInputStream(encodedBytes))));
-
+		MessageInput min = new MessageInput(new ByteArrayInputStream(out.toByteArray()));
+		
+		Frame shouldBeSynStream = Frame.decodeFrame(min);
+		
+		assertEquals(shouldBeSynStream, s);
+		
+		Frame shouldBeDataFrame = Frame.decodeFrame(min);
+		assertEquals(shouldBeDataFrame, df);
+		
+		/*
+		dataBytes = ((DataFrame)shouldBeDataFrame).getData();
+		Scanner scan = new Scanner(new ByteArrayInputStream(dataBytes));
+		String fileName = null;
+		
+		if(scan.hasNext()) {
+			if(scan.next().equalsIgnoreCase("GET")) {
+				if(scan.hasNext()) {
+					fileName = scan.next();
+				} else {
+					scan.close();
+					throw new SpeedyException("Invalid file name provided in GET request.");
+				}
+			} else {
+				scan.close();
+				throw new SpeedyException("Unexpected HTTP Request in DataFrame.");
+			}
+		} else {
+			scan.close();
+			throw new SpeedyException("Unexpected ending of parse in DataFrame.");
+		}
+		
+		scan.close();
+		assertEquals(fileName, "/");
+		*/
 	}
 
 	@Test(expected = SpeedyException.class)

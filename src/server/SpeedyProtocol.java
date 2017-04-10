@@ -92,10 +92,10 @@ public class SpeedyProtocol implements Runnable {
 			while(true) {
 				try {
 					Frame f = receiveFrame();
-					logger.info("Packet received from client " + clientSock.getInetAddress() + "-" + clientSock.getPort() + 
-							" with StreamID " + streamID + " with thread id " + Thread.currentThread().getId() + f + "\n");
-					
-					if(f instanceof DataFrame) {
+
+					if(f instanceof SynStream) {
+						
+						System.out.println("\n\n\n" + ((DataFrame)f).getData().length + "\n\n\n");
 						
 						// Generate Reply
 						Frame sendFrame = processDataAndGenerateReply(((DataFrame) f).getData());
@@ -108,7 +108,7 @@ public class SpeedyProtocol implements Runnable {
 							closeClient();
 							throw new ServerBreakException("Unable to write to client.");
 						}
-					} else if(f instanceof SynStream) {
+					} else if(f instanceof DataFrame) {
 						
 						throw new ServerContinueException("Unexpected SynStream.");
 					} else if(f instanceof FinStream) {
