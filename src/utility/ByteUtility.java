@@ -234,7 +234,7 @@ public class ByteUtility {
 		}
 		Deflater compress = new Deflater();
 		compress.setInput(data);
-		compress.setDictionary(ConstUtility.SPDY_dictionary_txt);
+		compress.setDictionary(ConstUtility.SPDY_DICTIONARY_TXT);
 		compress.finish();
 		byte[] compressedData = new byte[ConstUtility.MAX_COMPRESS_LENGTH];
 
@@ -257,7 +257,7 @@ public class ByteUtility {
 		int decompressLength = 0;
 		try {
 			decompress.inflate(decompressedData);
-			decompress.setDictionary(ConstUtility.SPDY_dictionary_txt);
+			decompress.setDictionary(ConstUtility.SPDY_DICTIONARY_TXT);
 			decompressLength = decompress.inflate(decompressedData);
 		} catch (DataFormatException e) {
 			// TODO Auto-generated catch block

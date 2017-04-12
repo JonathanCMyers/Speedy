@@ -66,10 +66,12 @@ public class HeaderBlock {
 		}
 		List<byte[]> encodedBlocks = new ArrayList<>();
 		int lengthOfEncode = 0;
-		
+		//Encode number of pairs
+		encodedBlocks.add(ByteUtility.uint32ToLittleEndian(numOfPairs));
+		lengthOfEncode += ConstUtility.NUMBER_NAME_VALUE_PAIRS_LENGTH;
+		//Encode blocks
 		for (Block block : blocksList) {
 			byte[] encodedBlock = block.encode();
-			
 			lengthOfEncode += encodedBlock.length;
 			encodedBlocks.add(encodedBlock);
 		}
@@ -82,7 +84,6 @@ public class HeaderBlock {
 			position += eb.length;
 		}
 		//Compress the data
-		
 		return ByteUtility.compress(encodedHeaderBlock);
 	}
 
@@ -98,7 +99,9 @@ public class HeaderBlock {
 			HeaderBlock headerBlock = new HeaderBlock();
 			int index = 0;
 			//Decode numOfPairs
-			int numOfPairs = 0;
+			int numOfPairs = ByteUtility.littleEndianToUINT32(
+						ByteUtility.byteSubarray(encodedHeaderBlock, index, ConstUtility.NUMBER_NAME_VALUE_PAIRS_LENGTH));
+			index += ConstUtility.NUMBER_NAME_VALUE_PAIRS_LENGTH;
 			while(index < encodedHeaderBlock.length - 1){
 				short lengthOfName = ByteUtility.littleEndianToUINT16(
 						ByteUtility.byteSubarray(encodedHeaderBlock, index, ConstUtility.BLOCK_NAME_LENGTH_LENGTH));
