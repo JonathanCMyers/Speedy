@@ -109,10 +109,14 @@ public class DataFrame extends Frame {
 		int index = 0;
 		int streamID = ByteUtility
 				.EndianToUINT32(ByteUtility.byteSubarray(encodedBytes, index, ConstUtility.STREAMID_BYTE_LENGTH));
-		byte[] data = ByteUtility.byteSubarray(encodedBytes, ConstUtility.DATA_STREAM_HEADER_LENGTH,
-				encodedBytes.length - ConstUtility.DATA_STREAM_HEADER_LENGTH);
+		index  += ConstUtility.STREAMID_BYTE_LENGTH;
+		index += ConstUtility.FLAGS_BYTE_LENGTH;
+		int length = decodeLength(ByteUtility.byteSubarray(encodedBytes, index, ConstUtility.LENGTH_BYTE_LENGTH));
+		byte[] data = ByteUtility.byteSubarray(encodedBytes, ConstUtility.DATA_STREAM_HEADER_LENGTH, length);
 		return new DataFrame(streamID, data);
 	}
+	
+	
 
 	@Override
 	public String toString() {

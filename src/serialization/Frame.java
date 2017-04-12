@@ -51,7 +51,6 @@ public abstract class Frame {
 		
 		int dataLength = decodeLength(ByteUtility.byteSubarray(header, header.length - ConstUtility.LENGTH_BYTE_LENGTH,
 				ConstUtility.LENGTH_BYTE_LENGTH));
-		System.out.println(dataLength);
 		
 		boolean cFlag = decodeCFlag(header[0]);
 		Frame frame = null;
@@ -195,13 +194,12 @@ public abstract class Frame {
 		}
 
 		int length = 0;
-		length += ((int) value[0] << 16) & 0xFF;
-		length += ((int) value[1] << 8) & 0xFF;
-		length += ((int) value[2]) & 0xFF;
+		length += ByteUtility.makeUnsigned(value[0]) << 16;
+		length += ByteUtility.makeUnsigned(value[1]) << 8 ;
+		length += ByteUtility.makeUnsigned( value[2]);
 
 		return length;
 	}
-
 	/**
 	 * Turn flags and length into byte array
 	 * 
