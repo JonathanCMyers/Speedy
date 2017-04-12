@@ -80,4 +80,8 @@ public class FrameReceiver extends Thread {
 		}
 	}
 	
+<<<<<<< HEAD
 }
+=======
+}
+>>>>>>> refs/remotes/origin/master

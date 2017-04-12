@@ -51,6 +51,7 @@ public abstract class Frame {
 		
 		int dataLength = decodeLength(ByteUtility.byteSubarray(header, header.length - ConstUtility.LENGTH_BYTE_LENGTH,
 				ConstUtility.LENGTH_BYTE_LENGTH));
+		System.out.println(dataLength);
 		
 		boolean cFlag = decodeCFlag(header[0]);
 		Frame frame = null;
