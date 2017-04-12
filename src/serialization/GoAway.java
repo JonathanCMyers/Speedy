@@ -14,8 +14,11 @@ import utility.ByteUtility;
 import utility.ConstUtility;
 
 public class GoAway extends ControlFrame {
-
+	//Holds the last stream id which was accepted by the sender
 	private int lastStreamID;
+	
+	//Holds the reason for closing the session
+	private int statusCode;
 
 	public GoAway() throws SpeedyException {
 		setType(ConstUtility.GOAWAY);
@@ -32,9 +35,21 @@ public class GoAway extends ControlFrame {
 		setType(ConstUtility.GOAWAY);
 		setLength(ConstUtility.GOAWAY_DEFAULT_LENGTH);
 		setLastStreamID(lastStreamID);
-
 	}
-
+	
+	/**
+	 * Constructor for the goaway frame
+	 * @param lastStreamID
+	 * @param statusCode
+	 * @throws SpeedyException
+	 */
+	public GoAway(int lastStreamID,int statusCode) throws SpeedyException {
+		setType(ConstUtility.GOAWAY);
+		setLength(ConstUtility.GOAWAY_DEFAULT_LENGTH);
+		setLastStreamID(lastStreamID);
+		setStatusCode(statusCode);
+	}
+	
 	/**
 	 * Encode goaway frame into byte array;
 	 * 
@@ -82,13 +97,27 @@ public class GoAway extends ControlFrame {
 
 	@Override
 	public String toString() {
-		return "[GoAway]: [LastID = " + lastStreamID + "]";
+		return "[LastStreamID:"+this.lastStreamID+"],[Status Code:"+this.statusCode+"]";
 	}
 
 	@Override
-	public boolean equals(Object o) {
-		// TODO
-		throw new UnsupportedOperationException("Goaway.equals()");
+	public boolean equals(Object obj) {
+		if(obj == null && this!=null){
+			return false;
+		}
+		if(this == obj) {
+			return true;
+		}
+		if(getClass() != obj.getClass()) {
+			return false;
+		}
+		GoAway go = (GoAway) obj;
+		//Check name
+		if(this.lastStreamID != go.getLastStreamID()){
+			return false;
+		}
+		
+		return true;
 	}
 
 	/**
@@ -97,10 +126,10 @@ public class GoAway extends ControlFrame {
 	 * @param lastStreamID
 	 * @throws SpeedyException
 	 */
-	private void setLastStreamID(int lastStreamID) throws SpeedyException {
+	public void setLastStreamID(int lastStreamID) throws SpeedyException {
 		if (lastStreamID <= 0) {
 			System.err.println("Stream ID should be non-negative integer.");
-			throw new SpeedyException("StreamID should be bigger than 0.");
+			throw new SpeedyException("StreamID is smaller than or equals to 0.");
 		}
 		this.lastStreamID = lastStreamID;
 	}
@@ -110,8 +139,28 @@ public class GoAway extends ControlFrame {
 	 * 
 	 * @param lastStreamID
 	 */
-	private int getLastStreamID() {
+	public int getLastStreamID() {
 		return this.lastStreamID;
 	}
-
+	
+	/**
+	 * Sets the status code for go away frame
+	 * @param code
+	 * @throws SpeedyException 
+	 */
+	public void setStatusCode(int code) throws SpeedyException{
+		if(code <0 || code > 3){
+			throw new SpeedyException("Wrong status code:" + code);
+		}
+		this.statusCode = code;
+	}
+	
+	
+	/**
+	 * Gets the status code of the goaway frame
+	 * @return
+	 */
+	public int getStatusCode(){
+		return this.statusCode;
+	}
 }
