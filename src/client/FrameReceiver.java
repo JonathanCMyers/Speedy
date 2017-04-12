@@ -79,9 +79,4 @@ public class FrameReceiver extends Thread {
 			return frameQueue.get(0);
 		}
 	}
-	
-<<<<<<< HEAD
 }
-=======
-}
->>>>>>> refs/remotes/origin/master
