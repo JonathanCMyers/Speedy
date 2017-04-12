@@ -70,6 +70,48 @@ public class DataFrameTest {
 	}
 	
 	@Test
+	public void testLongDecode() throws SpeedyException {
+		String pageRequest = "GET / " + ConstUtility.HTTP_VERSION + "\n";
+		pageRequest += ConstUtility.REQUEST_SOURCE + "\n";
+		pageRequest += ConstUtility.USER_AGENT + "\n";
+		pageRequest += "GET / " + ConstUtility.HTTP_VERSION + "\n";
+		pageRequest += ConstUtility.REQUEST_SOURCE + "\n";
+		pageRequest += ConstUtility.USER_AGENT + "\n";
+		pageRequest += "GET / " + ConstUtility.HTTP_VERSION + "\n";
+		pageRequest += ConstUtility.REQUEST_SOURCE + "\n";
+		pageRequest += ConstUtility.USER_AGENT + "\n";
+		pageRequest += "GET / " + ConstUtility.HTTP_VERSION + "\n";
+		pageRequest += ConstUtility.REQUEST_SOURCE + "\n";
+		pageRequest += ConstUtility.USER_AGENT + "\n";
+		pageRequest += "GET / " + ConstUtility.HTTP_VERSION + "\n";
+		pageRequest += ConstUtility.REQUEST_SOURCE + "\n";
+		pageRequest += ConstUtility.USER_AGENT + "\n";
+		pageRequest += "GET / " + ConstUtility.HTTP_VERSION + "\n";
+		pageRequest += ConstUtility.REQUEST_SOURCE + "\n";
+		pageRequest += ConstUtility.USER_AGENT + "\n";
+		pageRequest += "GET / " + ConstUtility.HTTP_VERSION + "\n";
+		pageRequest += ConstUtility.REQUEST_SOURCE + "\n";
+		pageRequest += ConstUtility.USER_AGENT + "\n";
+		pageRequest += "GET / " + ConstUtility.HTTP_VERSION + "\n";
+		pageRequest += ConstUtility.REQUEST_SOURCE + "\n";
+		pageRequest += ConstUtility.USER_AGENT + "\n";
+		pageRequest += "GET / " + ConstUtility.HTTP_VERSION + "\n";
+		pageRequest += ConstUtility.REQUEST_SOURCE + "\n";
+		pageRequest += ConstUtility.USER_AGENT + "\n";
+		pageRequest += "GET / " + ConstUtility.HTTP_VERSION + "\n";
+		pageRequest += ConstUtility.REQUEST_SOURCE + "\n";
+		pageRequest += ConstUtility.USER_AGENT + "\n";
+		
+		byte[] dataBytes = pageRequest.getBytes();
+		
+		Frame df = new DataFrame(221, dataBytes);
+		byte[] encodedBytes = df.encode();
+		
+		Frame f = Frame.decodeFrame(new MessageInput(new ByteArrayInputStream(encodedBytes)));
+		assertEquals(df, f);
+	}
+	
+	@Test
 	public void testHTTPDataCanBeParsed() throws SpeedyException {
 		String pageRequest = "GET / " + ConstUtility.HTTP_VERSION + "\n";
 		pageRequest += ConstUtility.REQUEST_SOURCE + "\n";

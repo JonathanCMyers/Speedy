@@ -66,10 +66,18 @@ public class FrameReceiver extends Thread {
 			}
 			if(f != null) {
 				frameQueue.add(f);
-				System.out.println("Frame added: " + f);
+				System.out.println("Frame added: " + f + "\n\n\n");
 			}
 		}
 		
+	}
+	
+	public Frame getTopOfQueue() {
+		if(frameQueue.size() == 0) {
+			return null;
+		} else {
+			return frameQueue.get(0);
+		}
 	}
 	
 }

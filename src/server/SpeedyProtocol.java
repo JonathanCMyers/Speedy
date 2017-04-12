@@ -179,6 +179,8 @@ public class SpeedyProtocol implements Runnable {
 		// Try to decode the frame
 		try {
 			fm = Frame.decodeFrame(min);
+		} catch(NetworkCloseException e) {
+			throw new ServerBreakException("Client terminated connection.", e);
 		} catch(SpeedyException e) {
 			try {
 				sendErrorMessage(e.getMessage());

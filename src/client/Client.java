@@ -13,11 +13,13 @@ import java.net.Socket;
 import java.net.UnknownHostException;
 
 import serialization.*;
+import serialization.exception.NetworkCloseException;
 import serialization.exception.SpeedyException;
 import utility.ClientFactory;
 import utility.ConstUtility;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Random;
 
 /**
@@ -80,6 +82,7 @@ public class Client {
 	public static void main(String[] args) {
 		handleArgs(args); // Store the port number and server from the arguments given
 		createSocket(); // Create socket that is connected to server on specified port
+		initializeFrameReceiver();
 		sendSynStream(); // Send a SynStream to the server
 		requestPage("/"); // Send an HTTP GET request
 		receiveHTTPReply(); // Receive HTTP reply
@@ -140,9 +143,8 @@ public class Client {
 	 * Creates a SynStream with a random odd streamID, and sends it to the server
 	 */
 	public static void sendSynStream() {
-		//Random r = new Random(2584);
-		//streamID = 2 * r.nextInt(200) + 1; // Must be odd
-		streamID = 34;
+		Random r = new Random();
+		streamID = 2 * r.nextInt(200) + 1; // Must be odd
 		byte[] encodedBytes = null;
 		try {
 			SynStream s = new SynStream(streamID);
@@ -181,13 +183,45 @@ public class Client {
 	}
 	
 	public static void receiveHTTPReply() {
+		while(true) {
+			byte[] dataBytes = new byte[0];
+			while(true) {
+				Frame f = ((FrameReceiver) frameReceiver).getTopOfQueue();
+				if(f != null) {
+					if(f instanceof DataFrame) {
+						byte[] dataFrameBytes = ((DataFrame)f).getData();
+						byte[] intermediateBytes = dataBytes;
+						dataBytes = new byte[intermediateBytes.length + dataFrameBytes.length];
+						for(int i = 0; i < intermediateBytes.length; i++) {
+							dataBytes[i] = intermediateBytes[i];
+						}
+						for(int i = 0; i < dataFrameBytes.length; i++) {
+							dataBytes[intermediateBytes.length + i] = dataFrameBytes[i];
+						}
+					} else {
+						System.err.println("Unexpected packet type received.");
+					}
+				}
+				if((new String(dataBytes)).contains("</html>")) {
+					break;
+				}
+			}
+			System.out.println(new String(dataBytes));
+			frameReceiver.interrupt();
+			System.out.println("YO!");
+			System.exit(1);
+		}
+		/*
 		Frame f = null;
 		try {
 			f = Frame.decodeFrame(min);
+		} catch(NetworkCloseException e) {
+			
 		} catch(SpeedyException e) {
 			System.err.println("Error decoding message: " + e.getMessage());
 			System.exit(1);
 		}
 		System.out.println(f);
+		*/
 	}
 }

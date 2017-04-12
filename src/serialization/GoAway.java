@@ -82,8 +82,7 @@ public class GoAway extends ControlFrame {
 
 	@Override
 	public String toString() {
-		// TODO
-		throw new UnsupportedOperationException("Goaway.toString()");
+		return "[GoAway]: [LastID = " + lastStreamID + "]";
 	}
 
 	@Override
