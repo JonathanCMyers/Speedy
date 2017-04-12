@@ -61,10 +61,12 @@ public abstract class ControlFrame extends Frame {
 			break;
 		case FIN_STREAM:
 			frame = SynReply.decode(encodedBytes);
-		case GOAWARY:
+			break;
+		case GOAWAY:
 			frame = GoAway.decode(encodedBytes);
+			break;
 		default:
-			throw new SpeedyException("Unexpected type "+type);
+			throw new SpeedyException("Unexpected type:"+type);
 		}
 		return frame;
 	}

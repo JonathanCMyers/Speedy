@@ -5,6 +5,7 @@ import static org.junit.Assert.*;
 import org.junit.Test;
 
 import serialization.Block;
+import serialization.GoAway;
 import serialization.HeaderBlock;
 import serialization.SynStream;
 import serialization.exception.SpeedyException;
@@ -14,9 +15,8 @@ public class HeaderBlockTest {
 	
 	@Test
 	public void testEmptyEquals() throws SpeedyException {
-		HeaderBlock hb = new HeaderBlock();
-		HeaderBlock hb1 = new HeaderBlock();
-		assertEquals(hb, hb1);
+		GoAway ga = new GoAway();
+		
 	}
 	
 	@Test

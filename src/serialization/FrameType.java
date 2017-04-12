@@ -22,7 +22,7 @@ public enum FrameType {
 	SYN_REPLY(2),
 	FIN_STREAM(3),
 	SETTINGS(4),
-	GOAWARY(5),
+	GOAWAY(5),
 	HEADERS(6);
 	
 	
@@ -75,7 +75,7 @@ public enum FrameType {
 		case 4:
 			return SETTINGS;
 		case 7:
-			return GOAWARY;
+			return GOAWAY;
 		case 8:
 			return HEADERS;
 		default:
