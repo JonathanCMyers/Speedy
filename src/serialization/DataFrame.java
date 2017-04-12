@@ -115,7 +115,7 @@ public class DataFrame extends Frame {
 
 	@Override
 	public String toString() {
-		return "[DataFrame]: [ID = " + streamID + "]";
+		return "[DataFrame]: [ID = " + streamID + "] [Data: " + new String(data) + "]";
 	}
 
 	/**
