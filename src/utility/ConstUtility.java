@@ -15,6 +15,10 @@ package utility;
  * @version 1.0 Build 03/23/2017
  */
 public class ConstUtility {
+	
+	public static final boolean USING_SSL = true; 	// States whether we are
+													// using SSL or not in this
+													// connection
 
 	// Frame
 	public static final short VERSION = 1;//
@@ -108,17 +112,19 @@ public class ConstUtility {
 	public static final int HELLO_BANDWIDTH_FROM_YOU = 2;//
 	public static final int HELLO_ROUND_TRIP_TIME = 3;//
 	public static final int HELLO_MAX_CONCURRENT_STREAMS = 4;//
-
-	public static final boolean USING_SSL = false; // States whether we are
-													// using SSL or not in this
-													// connection
+	
 	public static final int MAX_TCP_PAYLOAD_SIZE = 65507; // Maximum size that a
 															// single TCP packet
 															// can hold
 
-	public static final String HTTP_VERSION = "HTTP1.1";
+	public static final String HTTP_VERSION = "HTTP/1.1";
+	public static final String REQUEST_HOST = "Host: www.google.com";
 	public static final String REQUEST_SOURCE = "From: someuser@baylor.edu";
 	public static final String USER_AGENT = "User-Agent: HTTPTool/1.0";
+	public static final String REQUEST_CONNECTION = "Connection: Upgrade, HTTP2-Settings";
+	public static final String REQUEST_UPGRADE = "Upgrade: h2c";
+	public static final String REQUEST_HTTP2_SETTINGS = "HTTP2-Settings:\n";
+	
 	public static final String HTTP_CORRECT_VALIDATION = "200 OK";
 
 	// Compress

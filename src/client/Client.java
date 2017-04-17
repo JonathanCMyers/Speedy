@@ -8,9 +8,14 @@
 
 package client;
 
+// ARGUMENTS TO USE:
+// nghttp2.org 443
+
+
 import java.io.*;
 import java.net.Socket;
 import java.net.UnknownHostException;
+import java.nio.ByteBuffer;
 
 import serialization.*;
 import serialization.exception.NetworkCloseException;
@@ -21,6 +26,7 @@ import utility.ConstUtility;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Random;
+import java.util.Scanner;
 
 /**
  * Client to connect and retrieve data from a server
@@ -84,7 +90,13 @@ public class Client {
 		createSocket(); // Create socket that is connected to server on specified port
 		initializeFrameReceiver();
 		sendSynStream(); // Send a SynStream to the server
-		requestPage("/"); // Send an HTTP GET request
+		//readAllThatJuicyData();
+		//readAllThatJuicyData();
+		//readAllThatJuicyData();
+		//requestPage("/index.html"); // Send an HTTP GET request
+		//readAllThatJuicyData();
+		//readAllThatJuicyData();
+		//readAllThatJuicyData();
 		receiveHTTPReply(); // Receive HTTP reply
 	}
 	
@@ -160,9 +172,17 @@ public class Client {
 	}
 	
 	public static void requestPage(String fileRequest) {
+		/*
 		String pageRequest = "GET " + fileRequest + " " + ConstUtility.HTTP_VERSION + "\n";
 		pageRequest += ConstUtility.REQUEST_SOURCE + "\n";
 		pageRequest += ConstUtility.USER_AGENT + "\n";
+		*/
+		String pageRequest = "Get /index.html HTTP/1.1\n" + 
+				"Host: nghttp2.org\n" + 
+				"Connection: Upgrade, HTTP2-Settings\n" + 
+				"Upgrade: h2c\n" +
+				"HTTP2-Settings:\n" +
+				"User-Agent: whatever\n";
 		
 		
 		byte[] dataBytes = pageRequest.getBytes();
@@ -181,6 +201,20 @@ public class Client {
 			System.exit(1);
 		}
 	}
+	
+	/*
+	public static void readAllThatJuicyData() {
+		byte[] receivedBytes = new byte[65507];
+		int readCount = 0;
+		try {
+			readCount = in.read(receivedBytes);
+		} catch (IOException e) {
+			System.err.println("Error reading juicy data: " + e.getMessage());
+		}
+		//byte[] readBytes = Arrays.copyOfRange(receivedBytes, 0, readCount);
+		System.out.println("Read " + readCount + " bytes!");
+	}
+	*/
 	
 	public static void receiveHTTPReply() {
 		while(true) {
@@ -206,10 +240,11 @@ public class Client {
 					break;
 				}
 			}
-			System.out.println(new String(dataBytes));
-			frameReceiver.interrupt();
-			System.out.println("YO!");
-			System.exit(1);
+			//System.out.println(new String(dataBytes) + "!~!!!");
+			//System.out.println("YO!");
+			//Scanner kbReader = new Scanner(System.in);
+			//kbReader.next();
+			//kbReader.close();
 		}
 		/*
 		Frame f = null;

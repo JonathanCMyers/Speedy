@@ -18,7 +18,7 @@ public final class ClientFactory {
 	/**
 	 * SSL algorithm
 	 */
-	private static final String TLSALG = "TLSv1.1";
+	private static final String TLSALG = "TLSv1.2";
 
 	/**
 	 * Gets a TLS SSL client socket
