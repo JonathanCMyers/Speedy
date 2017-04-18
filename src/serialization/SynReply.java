@@ -245,8 +245,8 @@ public class SynReply extends ControlFrame {
 			cvt[0] = (byte) (cvt[0] | 0b10000000);
 		}
 		cvt[1] = (byte) (version >> 8 & 0b11111111);
-		cvt[2] = (byte) (type & 0b1111111);
-		cvt[3] = (byte) (type >> 8 & 0b1111111);
+		cvt[3] = (byte) (type & 0b1111111);
+		cvt[2] = (byte) (type >> 8 & 0b1111111);
 		return cvt;
 	}
 

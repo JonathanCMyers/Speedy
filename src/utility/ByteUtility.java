@@ -45,6 +45,18 @@ public class ByteUtility {
 	
 	
 	/**
+	 * Converts a uint16 into littleEndian
+	 * @param value to be converted into little endian byte form
+	 * @return bytes the converted short value
+	 */
+	public static byte[] uint16ToEndian(short value) {
+		byte[] bytes = new byte[2];
+		bytes[1] = (byte) (value & 0b11111111);
+		bytes[0] = (byte) (value >> 8 & 0b11111111);
+		return bytes;
+	}
+	
+	/**
 	 * Converts a set of bytes into a 16-bit, unsigned integer
 	 * @param bytes to be converted
 	 * @return value the converted bytes
@@ -58,6 +70,22 @@ public class ByteUtility {
 		value += makeUnsigned(bytes[0]);
 		return value;
 	}
+	
+	/**
+	 * Converts a set of none-converted bytes into a 16-bit, unsigned integer
+	 * @param bytes to be converted
+	 * @return value the converted bytes
+	 */
+	public static short endianToUINT16(byte[] bytes) {
+		if(bytes.length != 2) {
+			throw new IllegalArgumentException("Must be 2 bytes in length. Given: " + bytes.length + " bytes.");
+		}
+		short value = 0;
+		value += makeUnsigned(bytes[0]) << 8;
+		value += makeUnsigned(bytes[1]);
+		return value;
+	}
+	
 	/**
 	 * Converts a uint32 into littleEndian notation
 	 * @param value to be converted into little endian byte form

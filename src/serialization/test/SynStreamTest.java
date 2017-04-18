@@ -109,6 +109,19 @@ public class SynStreamTest {
 		s2.setPriority(2);
 		assertNotEquals(s1, s2);
 	}
+	
+	@Test
+	public void testHeaderBlockNotNAMEEquals() throws SpeedyException {
+		HeaderBlock headerBlock = new HeaderBlock();
+		HeaderBlock headerBlock1 = new HeaderBlock();
+		headerBlock.addBlock("Name1","value");
+		headerBlock1.addBlock("Name","value");
+		SynStream s1 = new SynStream(1,headerBlock);
+		SynStream s2 = new SynStream(1,headerBlock1);
+		
+		assertNotEquals(s1, s2);
+	}
+	
 	@Test
 	public void testOneSideNullNotEqual() throws SpeedyException {
 		HeaderBlock headerBlock = new HeaderBlock();

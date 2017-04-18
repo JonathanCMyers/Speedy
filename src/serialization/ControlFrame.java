@@ -51,7 +51,7 @@ public abstract class ControlFrame extends Frame {
 		
 		// Decode type
 		FrameType type = FrameType.getFrameType(ByteUtility
-				.littleEndianToUINT16(ByteUtility.byteSubarray(encodedBytes, index, ConstUtility.TYPE_BYTE_LENGTH)));
+				.endianToUINT16(ByteUtility.byteSubarray(encodedBytes, index, ConstUtility.TYPE_BYTE_LENGTH)));
 		switch(type){
 		case SYN_STREAM:
 			frame = SynStream.decode(encodedBytes);
@@ -124,7 +124,7 @@ public abstract class ControlFrame extends Frame {
 	 */
 	protected byte[] getBytesCVT(boolean CFlag, short version, short type) {
 		byte[] cvt = new byte[4];
-
+		System.out.println(version);
 		cvt[0] = (byte) (version >> 8 & 0b11111111);
 		cvt[1] = (byte) (version & 0b11111111);
 
@@ -132,7 +132,7 @@ public abstract class ControlFrame extends Frame {
 			cvt[0] = (byte) (cvt[0] | 0b10000000);
 		}
 
-		byte[] typebytes = ByteUtility.uint16ToLittleEndian(type);
+		byte[] typebytes = ByteUtility.uint16ToEndian(type);
 		ByteUtility.copyBytes(cvt, 2, typebytes);
 
 		return cvt;

@@ -138,7 +138,7 @@ public class SynStream extends ControlFrame {
 		index += ConstUtility.VERSION_BYTE_LENGTH;
 		// Decode type
 		short type = (short) ByteUtility
-				.littleEndianToUINT16(ByteUtility.byteSubarray(encodedBytes, index, ConstUtility.TYPE_BYTE_LENGTH));
+				.endianToUINT16(ByteUtility.byteSubarray(encodedBytes, index, ConstUtility.TYPE_BYTE_LENGTH));
 		index += ConstUtility.TYPE_BYTE_LENGTH;
 		// Decode flags
 		byte flags = encodedBytes[index];
